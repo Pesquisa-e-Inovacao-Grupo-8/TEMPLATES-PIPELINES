@@ -1,0 +1,40 @@
+name: Create Infrastructure
+
+on:
+  workflow_dispatch:
+
+jobs:
+
+  terraform:
+
+    runs-on: ubuntu-latest
+
+    env:
+      TF_VAR_account1_access_key: ${{ secrets.ACCOUNT1_ACCESS_KEY }}
+      TF_VAR_account1_secret_key: ${{ secrets.ACCOUNT1_SECRET_KEY }}
+
+      # Essa parte do código será utilizada assim que adicionarmos as contas AWS do grupo.
+
+      # TF_VAR_account2_access_key: ${{ secrets.ACCOUNT2_ACCESS_KEY }}
+      # TF_VAR_account2_secret_key: ${{ secrets.ACCOUNT2_SECRET_KEY }}
+
+      # TF_VAR_account3_access_key: ${{ secrets.ACCOUNT3_ACCESS_KEY }}
+      # TF_VAR_account3_secret_key: ${{ secrets.ACCOUNT3_SECRET_KEY }}
+
+      # TF_VAR_account4_access_key: ${{ secrets.ACCOUNT4_ACCESS_KEY }}
+      # TF_VAR_account4_secret_key: ${{ secrets.ACCOUNT4_SECRET_KEY }}
+
+      # TF_VAR_account5_access_key: ${{ secrets.ACCOUNT5_ACCESS_KEY }}
+      # TF_VAR_account5_secret_key: ${{ secrets.ACCOUNT5_SECRET_KEY }}
+
+    steps:
+
+      - uses: actions/checkout@v4
+
+      - uses: hashicorp/setup-terraform@v3
+
+      - run: terraform init
+
+      - run: terraform plan
+
+      - run: terraform apply -auto-approve
