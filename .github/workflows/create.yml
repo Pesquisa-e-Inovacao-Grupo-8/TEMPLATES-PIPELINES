@@ -29,12 +29,20 @@ jobs:
 
     steps:
 
-      - uses: actions/checkout@v4
+      - name: Checkout repositório
+        uses: actions/checkout@v4
 
-      - uses: hashicorp/setup-terraform@v3
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
 
-      - run: terraform init
+      - name: Iniciando Terraform
+        run: terraform init
+        working-directory: ./terraform
 
-      - run: terraform plan
+      - name: Gerando plano
+        run: terraform plan
+        working-directory: ./terraform
 
-      - run: terraform apply -auto-approve
+      - name: Aplicando mudanças
+        run: terraform apply -auto-approve
+        working-directory: ./terraform
