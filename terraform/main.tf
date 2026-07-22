@@ -2,7 +2,7 @@
 # EC2 - ACCOUNT 1
 ##########################################
 
-resource "aws_instance" "account1_dev" {
+resource "aws_instance" "account1" {
 
   provider = aws.account1
 
