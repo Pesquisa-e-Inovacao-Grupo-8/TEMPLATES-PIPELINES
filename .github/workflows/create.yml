@@ -36,13 +36,14 @@ jobs:
         uses: hashicorp/setup-terraform@v3
 
       - name: Iniciando Terraform
-        run: terraform init
         working-directory: ./terraform
+        run: terraform init
 
       - name: Gerando plano
-        run: terraform plan
         working-directory: ./terraform
+        run: terraform plan
 
       - name: Aplicando mudanças
-        run: terraform apply -auto-approve
         working-directory: ./terraform
+        run: terraform apply -auto-approve
+        
