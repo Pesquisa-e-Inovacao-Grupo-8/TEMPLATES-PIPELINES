@@ -13,24 +13,17 @@ jobs:
       TF_VAR_account1_access_key: ${{ secrets.ACCOUNT1_ACCESS_KEY }}
       TF_VAR_account1_secret_key: ${{ secrets.ACCOUNT1_SECRET_KEY }}
 
-      # Essa parte do código será utilizada assim que adicionarmos as contas AWS do grupo.
-
-      # TF_VAR_account2_access_key: ${{ secrets.ACCOUNT2_ACCESS_KEY }}
-      # TF_VAR_account2_secret_key: ${{ secrets.ACCOUNT2_SECRET_KEY }}
-
-      # TF_VAR_account3_access_key: ${{ secrets.ACCOUNT3_ACCESS_KEY }}
-      # TF_VAR_account3_secret_key: ${{ secrets.ACCOUNT3_SECRET_KEY }}
-
-      # TF_VAR_account4_access_key: ${{ secrets.ACCOUNT4_ACCESS_KEY }}
-      # TF_VAR_account4_secret_key: ${{ secrets.ACCOUNT4_SECRET_KEY }}
-
-      # TF_VAR_account5_access_key: ${{ secrets.ACCOUNT5_ACCESS_KEY }}
-      # TF_VAR_account5_secret_key: ${{ secrets.ACCOUNT5_SECRET_KEY }}
-
     steps:
 
       - name: Checkout repositório
         uses: actions/checkout@v4
+
+      - name: Configurando credenciais AWS
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.ACCOUNT1_ACCESS_KEY }}
+          aws-secret-access-key: ${{ secrets.ACCOUNT1_SECRET_KEY }}
+          aws-region: us-east-1
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
