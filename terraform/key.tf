@@ -22,4 +22,6 @@ resource "local_file" "private_key" {
 
   filename = "./terraform-generated-key.pem"
 
+  file_permission = "0600"
+
 }

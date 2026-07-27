@@ -54,25 +54,31 @@ jobs:
           sudo apt install ansible -y
 
       - name: Esperar SSH da EC2
-
         run: |
+          IP="$(terraform -chdir=terraform output -raw ec2_public_ip)"
+          PRIVATE_KEY="${GITHUB_WORKSPACE}/terraform/terraform-generated-key.pem"
 
-          IP=$(terraform -chdir=terraform output -raw ec2_public_ip)
-
-          echo "Esperando $IP"
+          chmod 600 "$PRIVATE_KEY"
+          echo "Esperando SSH em $IP"
 
           for i in {1..30}
           do
+            if ssh \
+              -o BatchMode=yes \
+              -o ConnectTimeout=5 \
+              -o ConnectionAttempts=1 \
+              -o StrictHostKeyChecking=no \
+              -i "$PRIVATE_KEY" \
+              "ubuntu@$IP" "echo conectado"; then
+              exit 0
+            fi
 
-          ssh -o StrictHostKeyChecking=no \
-          -i ~/.ssh/minha-chave.pem \
-          ubuntu@$IP "echo conectado" && break
-
-          echo "aguardando..."
-
-          sleep 10
-
+            echo "SSH ainda indisponível (tentativa $i/30)."
+            sleep 10
           done
+
+          echo "A instância não ficou acessível por SSH em 5 minutos." >&2
+          exit 1
 
       - name: Executar Ansible
 
@@ -81,5 +87,3 @@ jobs:
           ansible-playbook \
           -i ansible/inventory.ini \
           ansible/playbook.yml
-
-        
