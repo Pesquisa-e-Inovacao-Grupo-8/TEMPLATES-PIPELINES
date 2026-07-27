@@ -49,4 +49,41 @@ jobs:
       - name: Aplicando mudanças
         working-directory: ./terraform
         run: terraform apply -auto-approve
+
+      - name: Instalar Ansible
+        run: |
+
+          sudo apt update
+
+          sudo apt install ansible -y
+
+      - name: Esperar SSH da EC2
+
+        run: |
+
+          IP=$(terraform -chdir=terraform output -raw ec2_public_ip)
+
+          echo "Esperando $IP"
+
+          for i in {1..30}
+          do
+
+          ssh -o StrictHostKeyChecking=no \
+          -i ~/.ssh/minha-chave.pem \
+          ubuntu@$IP "echo conectado" && break
+
+          echo "aguardando..."
+
+          sleep 10
+
+          done
+
+      - name: Executar Ansible
+
+        run: |
+
+          ansible-playbook \
+          -i ansible/inventory.ini \
+          ansible/playbook.yml
+
         

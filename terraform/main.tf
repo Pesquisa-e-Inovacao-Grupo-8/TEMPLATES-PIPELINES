@@ -8,6 +8,8 @@ resource "aws_instance" "account1" {
 
   ami = data.aws_ami.ubuntu.id
 
+  key_name = aws_key_pair.generated_key.key_name
+
   instance_type = var.instance_type
 
   root_block_device {
