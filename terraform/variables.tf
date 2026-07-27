@@ -33,3 +33,21 @@ variable "aws_region" {
   type        = string
   default     = "us-east-1"
 }
+
+variable "vpc_cidr" {
+  description = "Bloco CIDR da VPC"
+  type        = string
+  default     = "10.0.0.0/16"
+}
+
+variable "public_subnet_cidr" {
+  description = "Bloco CIDR da Subnet Pública"
+  type        = string
+  default     = "10.0.1.0/24"
+}
+
+variable "allowed_ssh_cidr" {
+  description = "Blocos CIDR autorizados a acessar a instância por SSH"
+  type        = list(string)
+  default     = ["0.0.0.0/0"]
+}
