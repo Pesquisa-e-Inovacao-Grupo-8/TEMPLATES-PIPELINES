@@ -30,6 +30,16 @@ jobs:
         working-directory: ./terraform
         run: terraform init
 
+      - name: Listar arquivos
+        working-directory: ./terraform
+        run: |
+          pwd
+          ls -la
+
+      - name: Mostrar state
+        working-directory: ./terraform
+        run: terraform state list
+
       - name: Destruindo recursos
         working-directory: ./terraform
         run: terraform destroy -auto-approve
