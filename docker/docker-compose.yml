@@ -1,0 +1,150 @@
+services:
+
+  # ==========================================
+  # BANCO DE DADOS
+  # ==========================================
+
+  banco:
+    build:
+      context: ./banco
+      dockerfile: Dockerfile
+
+    container_name: banco
+
+    restart: unless-stopped
+
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+
+    volumes:
+      - banco_data:/var/lib/mysql
+
+    networks:
+      - app-network
+
+
+  # ==========================================
+  # BACKEND JAVA
+  # ==========================================
+
+  java:
+    build:
+      context: ./java
+      dockerfile: Dockerfile
+
+    container_name: backend-java
+
+    restart: unless-stopped
+
+    depends_on:
+      - banco
+
+    environment:
+      DB_HOST: banco
+      DB_PORT: 3306
+      DB_NAME: ${MYSQL_DATABASE}
+      DB_USER: ${MYSQL_USER}
+      DB_PASSWORD: ${MYSQL_PASSWORD}
+
+    ports:
+      - "8080:8080"
+
+    networks:
+      - app-network
+
+
+  # ==========================================
+  # PYTHON 1
+  # ==========================================
+
+  python-1:
+    build:
+      context: ./python-1
+      dockerfile: Dockerfile
+
+    container_name: python-1
+
+    restart: unless-stopped
+
+    depends_on:
+      - banco
+
+    environment:
+      DB_HOST: banco
+      DB_PORT: 3306
+      DB_NAME: ${MYSQL_DATABASE}
+      DB_USER: ${MYSQL_USER}
+      DB_PASSWORD: ${MYSQL_PASSWORD}
+
+    networks:
+      - app-network
+
+
+  # ==========================================
+  # PYTHON 2
+  # ==========================================
+
+  python-2:
+    build:
+      context: ./python-2
+      dockerfile: Dockerfile
+
+    container_name: python-2
+
+    restart: unless-stopped
+
+    depends_on:
+      - banco
+
+    environment:
+      DB_HOST: banco
+      DB_PORT: 3306
+      DB_NAME: ${MYSQL_DATABASE}
+      DB_USER: ${MYSQL_USER}
+      DB_PASSWORD: ${MYSQL_PASSWORD}
+
+    networks:
+      - app-network
+
+
+  # ==========================================
+  # FRONTEND
+  # ==========================================
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+
+    container_name: frontend
+
+    restart: unless-stopped
+
+    depends_on:
+      - java
+
+    ports:
+      - "80:80"
+
+    networks:
+      - app-network
+
+
+# ==========================================
+# VOLUMES
+# ==========================================
+
+volumes:
+  banco_data:
+
+
+# ==========================================
+# NETWORK
+# ==========================================
+
+networks:
+  app-network:
+    driver: bridge

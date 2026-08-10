@@ -1,5 +1,3 @@
-# Buscando a imagem AMI que será usada no servidor
-
 data "aws_ami" "ubuntu" {
 
   most_recent = true

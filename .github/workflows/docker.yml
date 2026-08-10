@@ -1,0 +1,89 @@
+name: Deploy Docker Compose
+
+on:
+  workflow_call:
+    inputs:
+      ec2_public_ip:
+        description: "IP público da EC2"
+        required: true
+        type: string
+
+jobs:
+
+  copy-compose:
+    name: Copy Docker Compose
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Configure SSH
+        run: |
+          mkdir -p ~/.ssh
+
+          echo "${{ secrets.EC2_SSH_PRIVATE_KEY }}" > ~/.ssh/ec2_key
+
+          chmod 600 ~/.ssh/ec2_key
+
+      - name: Esperar SSH da EC2
+        run: |
+
+          IP="${{ inputs.ec2_public_ip }}"
+
+          echo "Esperando SSH em $IP"
+
+          for i in {1..30}
+          do
+            if ssh \
+              -o BatchMode=yes \
+              -o ConnectTimeout=5 \
+              -o ConnectionAttempts=1 \
+              -o StrictHostKeyChecking=no \
+              -i ~/.ssh/ec2_key \
+              "ubuntu@$IP" \
+              "echo conectado"; then
+
+              echo "EC2 acessível via SSH."
+              exit 0
+            fi
+
+            echo "SSH ainda indisponível (tentativa $i/30)."
+
+            sleep 10
+          done
+
+          echo "A instância não ficou acessível por SSH em 5 minutos." >&2
+          exit 1
+
+      - name: Create application directory
+        run: |
+          IP="${{ inputs.ec2_public_ip }}"
+
+          ssh \
+            -o StrictHostKeyChecking=no \
+            -i ~/.ssh/ec2_key \
+            "ubuntu@$IP" \
+            "mkdir -p /home/ubuntu/app"
+
+      - name: Copy Docker Compose
+        run: |
+          IP="${{ inputs.ec2_public_ip }}"
+
+          scp \
+            -o StrictHostKeyChecking=no \
+            -i ~/.ssh/ec2_key \
+            docker-compose.yml \
+            "ubuntu@$IP:/home/ubuntu/app/docker-compose.yml"
+
+      - name: Verify file
+        run: |
+          IP="${{ inputs.ec2_public_ip }}"
+
+          ssh \
+            -o StrictHostKeyChecking=no \
+            -i ~/.ssh/ec2_key \
+            "ubuntu@$IP" \
+            "ls -lh /home/ubuntu/app/docker-compose.yml"
+            "cd /home/ubuntu/app && docker compose up -d"
