@@ -2,10 +2,15 @@ name: Create Terraform
 
 on:
   workflow_call:
+
     outputs:
       ec2_public_ip:
         description: "IP público da EC2 criada pelo Terraform"
-        value: ${{ jobs.terraform.outputs.ec2_public_ip }}
+        value: ${{ jobs.terraform.outputs.ec2_public_ip }} 
+
+      private_key_pem:
+        description: "Chave privada PEM para acessar a EC2"
+        value: ${{ jobs.terraform.outputs.private_key_pem }}
 
 jobs:
 
@@ -14,6 +19,7 @@ jobs:
 
     outputs:
       ec2_public_ip: ${{ steps.ec2_ip.outputs.ec2_public_ip }}
+      private_key_pem: ${{ steps.private_key.outputs.private_key_pem }}
 
     env:
       TF_VAR_account1_access_key: ${{ secrets.ACCOUNT1_ACCESS_KEY }}
@@ -59,5 +65,13 @@ jobs:
           IP=$(terraform output -raw ec2_public_ip)
 
           echo "EC2 Public IP: $IP"
-
           echo "ec2_public_ip=$IP" >> "$GITHUB_OUTPUT"
+
+      - name: Obtendo Chave Privada da EC2
+        id: private_key
+        working-directory: ./terraform
+        run: |
+          PRIVATE_KEY=$(terraform output -raw private_key_pem)
+
+          echo "Chave Privada PEM: $PRIVATE_KEY"
+          echo "private_key_pem=$PRIVATE_KEY" >> "$GITHUB_OUTPUT"

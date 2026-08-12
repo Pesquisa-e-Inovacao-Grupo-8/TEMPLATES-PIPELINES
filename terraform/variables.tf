@@ -1,5 +1,3 @@
-# Criando variáveis das chaves para acessar os IDs na AWS 
-
 variable "account1_access_key" {
   type      = string
   sensitive = true

@@ -2,9 +2,14 @@ name: Create Ansible
 
 on:
   workflow_call:
+  
     inputs:
       ec2_public_ip:
         description: "IP público da EC2"
+        required: true
+        type: string
+
+      private_key_pem: 
         required: true
         type: string
 
@@ -27,11 +32,13 @@ jobs:
           sudo apt update
           sudo apt install -y ansible
 
-      - name: Configurar chave SSH
+      - name: Configurar chave SSH 
         run: |
           mkdir -p ~/.ssh
-
-          echo "${{ secrets.EC2_SSH_PRIVATE_KEY }}" > ~/.ssh/ec2_key
+          cat << 'EOF' > ~/.ssh/ec2_key
+          ${{ inputs.private_key_pem }}
+          EOF
+          chmod 600 ~/.ssh/ec2_key
 
           chmod 600 ~/.ssh/ec2_key
 
