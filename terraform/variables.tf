@@ -11,7 +11,7 @@ variable "account1_secret_key" {
 variable "instance_type" {
   description = "Tipo da instância EC2"
   type        = string
-  default     = "t3.micro"
+  default     = "t2.micro"
 }
 
 variable "disk_size" {
@@ -29,7 +29,7 @@ variable "disk_type" {
 variable "aws_region" {
   description = "Região AWS"
   type        = string
-  default     = "us-east-2"
+  default     = "us-east-1"
 }
 
 variable "vpc_cidr" {
