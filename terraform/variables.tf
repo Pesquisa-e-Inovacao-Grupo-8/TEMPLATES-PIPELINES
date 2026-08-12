@@ -11,7 +11,7 @@ variable "account1_secret_key" {
 variable "instance_type" {
   description = "Tipo da instância EC2"
   type        = string
-  default     = "t3.small"
+  default     = "t3.micro"
 }
 
 variable "disk_size" {
