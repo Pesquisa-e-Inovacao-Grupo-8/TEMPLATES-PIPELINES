@@ -29,7 +29,7 @@ variable "disk_type" {
 variable "aws_region" {
   description = "Região AWS"
   type        = string
-  default     = "us-east-1"
+  default     = "us-east-2"
 }
 
 variable "vpc_cidr" {
