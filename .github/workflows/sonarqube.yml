@@ -11,6 +11,8 @@ on:
         description: "SonarCloud Organization"
         required: true
         type: string
+  env:
+    SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
 permissions:
   contents: read
