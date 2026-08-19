@@ -1,0 +1,35 @@
+name: SonarCloud analysis
+
+on:
+  workflow_call:
+    inputs:
+      sonar_project_key:
+        description: "SonarCloud Project Key"
+        required: true
+        type: string
+      sonar_organization:
+        description: "SonarCloud Organization"
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  Analysis:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Analyze with SonarCloud
+        uses: SonarSource/sonarcloud-github-action@4006f663ecaf1f8093e8e4abb9227f6041f52216
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        with:
+          args: >
+            -Dsonar.projectKey=${{ inputs.sonar_project_key }}
+            -Dsonar.organization=${{ inputs.sonar_organization }}
+          projectBaseDir: .

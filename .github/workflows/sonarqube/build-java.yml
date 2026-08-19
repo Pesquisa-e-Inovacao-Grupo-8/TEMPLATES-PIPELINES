@@ -1,0 +1,13 @@
+name: Build
+
+on:
+  push:
+    branches: ["release"]
+
+jobs:
+  sonar:
+    uses: ./Pesquisa-e-Inovacao-Grupo-8/TEMPLATES-PIPELINES/tree/main/.github/workflows
+    with:
+      sonar_project_key: "${{github.repository}}"
+      sonar_organization: "${{github.organization}}"
+    secrets: inherit
