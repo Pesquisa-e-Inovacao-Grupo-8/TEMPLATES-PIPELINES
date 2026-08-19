@@ -2,12 +2,21 @@ name: Build
 
 on:
   workflow_call:
+    inputs:
+      sonar_project_key:
+        description: "SonarCloud Project Key"
+        required: true
+        type: string
+
+      sonar_organization:
+        description: "SonarCloud Organization"
+        required: true
+        type: string
 
 jobs:
   sonar:
-    uses: Pesquisa-e-Inovacao-Grupo-8/TEMPLATES-PIPELINES/.github/workflows/sonarqube/node.yml@main
+    uses: Pesquisa-e-Inovacao-Grupo-8/TEMPLATES-PIPELINES/.github/workflows/sonarqube-node.yml@main
     with:
-      sonar_project_key: ${{ github.repository }}
-      sonar_organization: ${{ github.repository_owner }}
+      sonar_project_key: ${{ inputs.sonar_project_key }}
+      sonar_organization: ${{ inputs.sonar_organization }}
     secrets: inherit
-
