@@ -1,4 +1,4 @@
-name: SonarCloud - Analysis
+name: SonarCloud analysis
 
 on:
   workflow_call:
@@ -12,7 +12,11 @@ on:
         description: "SonarCloud Organization"
         required: true
         type: string
-        
+
+    secrets:
+      SONAR_TOKEN:
+        required: true
+
 permissions:
   contents: read
   pull-requests: read
