@@ -1,4 +1,4 @@
-name: SonarCloud analysis
+name: SonarCloud - Analysis
 
 on:
   workflow_call:
@@ -7,19 +7,22 @@ on:
         description: "SonarCloud Project Key"
         required: true
         type: string
+
       sonar_organization:
         description: "SonarCloud Organization"
         required: true
         type: string
-  env:
-    SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+    secrets:
+      SONAR_TOKEN:
+        required: true
 
 permissions:
   contents: read
   pull-requests: read
 
 jobs:
-  Analysis:
+  analysis:
     runs-on: ubuntu-latest
 
     steps:
