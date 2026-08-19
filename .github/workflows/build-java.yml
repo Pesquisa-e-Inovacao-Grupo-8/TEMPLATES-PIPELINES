@@ -16,6 +16,7 @@ on:
 jobs:
   sonar:
     uses: Pesquisa-e-Inovacao-Grupo-8/TEMPLATES-PIPELINES/.github/actions/sonarqube/node
+    with:
       sonar_project_key: ${{ inputs.sonar_project_key }}
       sonar_organization: ${{ inputs.sonar_organization }}
     secrets: inherit
