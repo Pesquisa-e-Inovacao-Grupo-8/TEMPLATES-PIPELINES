@@ -1,26 +1,21 @@
 services:
 
   # ==========================================
-  # BANCO DE DADOS
+  # BANCO DE DADOS - POSTGRESQL
   # ==========================================
 
   banco:
-    build:
-      context: ./banco
-      dockerfile: Dockerfile
-
+    image: postgres:16
     container_name: banco
-
     restart: unless-stopped
 
     environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-      MYSQL_DATABASE: ${MYSQL_DATABASE}
-      MYSQL_USER: ${MYSQL_USER}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
 
     volumes:
-      - banco_data:/var/lib/mysql
+      - banco_data:/var/lib/postgresql/data
 
     networks:
       - app-network
@@ -31,12 +26,8 @@ services:
   # ==========================================
 
   java:
-    build:
-      context: ./java
-      dockerfile: Dockerfile
-
+    image: SEU_USUARIO_DOCKERHUB/backend-java:latest
     container_name: backend-java
-
     restart: unless-stopped
 
     depends_on:
@@ -44,10 +35,10 @@ services:
 
     environment:
       DB_HOST: banco
-      DB_PORT: 3306
-      DB_NAME: ${MYSQL_DATABASE}
-      DB_USER: ${MYSQL_USER}
-      DB_PASSWORD: ${MYSQL_PASSWORD}
+      DB_PORT: 5432
+      DB_NAME: ${POSTGRES_DB}
+      DB_USER: ${POSTGRES_USER}
+      DB_PASSWORD: ${POSTGRES_PASSWORD}
 
     ports:
       - "8080:8080"
@@ -61,12 +52,8 @@ services:
   # ==========================================
 
   python-1:
-    build:
-      context: ./python-1
-      dockerfile: Dockerfile
-
+    image: SEU_USUARIO_DOCKERHUB/python-1:latest
     container_name: python-1
-
     restart: unless-stopped
 
     depends_on:
@@ -74,10 +61,10 @@ services:
 
     environment:
       DB_HOST: banco
-      DB_PORT: 3306
-      DB_NAME: ${MYSQL_DATABASE}
-      DB_USER: ${MYSQL_USER}
-      DB_PASSWORD: ${MYSQL_PASSWORD}
+      DB_PORT: 5432
+      DB_NAME: ${POSTGRES_DB}
+      DB_USER: ${POSTGRES_USER}
+      DB_PASSWORD: ${POSTGRES_PASSWORD}
 
     networks:
       - app-network
@@ -88,12 +75,8 @@ services:
   # ==========================================
 
   python-2:
-    build:
-      context: ./python-2
-      dockerfile: Dockerfile
-
+    image: SEU_USUARIO_DOCKERHUB/python-2:latest
     container_name: python-2
-
     restart: unless-stopped
 
     depends_on:
@@ -101,10 +84,10 @@ services:
 
     environment:
       DB_HOST: banco
-      DB_PORT: 3306
-      DB_NAME: ${MYSQL_DATABASE}
-      DB_USER: ${MYSQL_USER}
-      DB_PASSWORD: ${MYSQL_PASSWORD}
+      DB_PORT: 5432
+      DB_NAME: ${POSTGRES_DB}
+      DB_USER: ${POSTGRES_USER}
+      DB_PASSWORD: ${POSTGRES_PASSWORD}
 
     networks:
       - app-network
@@ -115,12 +98,8 @@ services:
   # ==========================================
 
   frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
-
+    image: SEU_USUARIO_DOCKERHUB/frontend:latest
     container_name: frontend
-
     restart: unless-stopped
 
     depends_on:
@@ -148,3 +127,4 @@ volumes:
 networks:
   app-network:
     driver: bridge
+
