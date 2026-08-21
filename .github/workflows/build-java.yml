@@ -20,13 +20,6 @@ jobs:
     with:
       GITHUB_REPOSITORY_NAME: ${{ inputs.GITHUB_REPOSITORY_NAME }}
       GITHUB_ORGANIZATION: ${{ inputs.GITHUB_ORGANIZATION }}
-      
-  # build-image:
-  #   name: Build Docker Images
-  #   uses: Pesquisa-e-Inovacao-Grupo-8/TEMPLATES-PIPELINES/.github/workflows/docker.yml@main
-  #   with:
-  #     GITHUB_REPOSITORY_NAME: ${{ inputs.GITHUB_REPOSITORY_NAME }}
-  #     GITHUB_ORGANIZATION: ${{ inputs.GITHUB_ORGANIZATION }}
 
   deploy:
     name: Deploy to EC2 - PUBLIC
