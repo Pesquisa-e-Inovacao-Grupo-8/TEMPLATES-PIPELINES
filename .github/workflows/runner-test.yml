@@ -6,10 +6,6 @@ on:
 jobs:
   runner-test:
     name: Runner Sanity Check
-    on: workflow_dispatch
-    jobs:
-      test:
-        runs-on: self-hosted
-        steps:
-          - run: echo "ok"; hostname
-
+    runs-on: self-hosted
+    steps:
+      - run: echo "ok"; hostname
