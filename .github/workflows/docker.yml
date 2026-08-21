@@ -1,0 +1,34 @@
+name: Build and Push - Docker Hub
+
+on:
+  workflow_dispatch:
+      
+jobs:
+
+  docker:
+    name: Build Docker Images
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_REPOSITORY_NAME: ${{ inputs.GITHUB_REPOSITORY_NAME }}
+      GITHUB_ORGANIZATION: ${{ inputs.GITHUB_ORGANIZATION }}
+      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+      DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+
+    steps:
+     - name: Checkout
+       uses: actions/checkout@v4
+
+     - name: Log in to Docker Hub
+       uses: docker/login-action@v2
+       with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}          
+
+     - name: Build and Push Docker Images
+       run: |
+          echo "GITHUB_REPOSITORY: $GITHUB_REPOSITORY_NAME"
+          echo "GITHUB_ORGANIZATION: $GITHUB_ORGANIZATION"
+          
+          docker build -t $DOCKERHUB_USERNAME/$GITHUB_REPOSITORY_NAME:${{github.run_number}} .
+          docker push $DOCKERHUB_USERNAME/$GITHUB_REPOSITORY_NAME:${{github.run_number}}
+     

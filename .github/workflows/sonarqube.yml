@@ -21,7 +21,7 @@ permissions:
   pull-requests: read
 
 jobs:
-  analysis:
+  ANALISE-SONAR:
     runs-on: ubuntu-latest
 
     steps:
