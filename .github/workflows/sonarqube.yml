@@ -41,16 +41,16 @@ jobs:
       - name: SonarCloud
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          GITHUB_ORGANIZATION: ${{ inputs.GITHUB_ORGANIZATION }}
+          GITHUB_REPOSITORY_NAME: ${{ inputs.GITHUB_REPOSITORY }}
         run: |
-           $GITHUB_ORGANIZATION=$(echo "$GITHUB_ORGANIZATION" | tr '[:upper:]' '[:lower:]')
+          GITHUB_ORGANIZATION=$(echo "$GITHUB_ORGANIZATION" | tr '[:upper:]' '[:lower:]')
 
-
-            echo "GITHUB_REPOSITORY: $GITHUB_REPOSITORY_NAME"
-            echo "GITHUB_ORGANIZATION: $GITHUB_ORGANIZATION"
-            echo "SONAR_PROJECT_KEY: ${GITHUB_ORGANIZATION}_${GITHUB_REPOSITORY_NAME}"
+          echo "GITHUB_REPOSITORY: $GITHUB_REPOSITORY_NAME"
+          echo "GITHUB_ORGANIZATION: $GITHUB_ORGANIZATION"
+          echo "SONAR_PROJECT_KEY: ${GITHUB_ORGANIZATION}_${GITHUB_REPOSITORY_NAME}"
 
           ./mvnw clean verify sonar:sonar \
             -Dsonar.projectKey="${GITHUB_ORGANIZATION}_${GITHUB_REPOSITORY_NAME}" \
             -Dsonar.organization="$GITHUB_ORGANIZATION" \
             -Dsonar.token="$SONAR_TOKEN"
-
