@@ -3,7 +3,7 @@ name: BUILD JAVA - DOCKER
 on:
   workflow_call:
     inputs:
-      GITHUB_REPOSITORY:
+      GITHUB_REPOSITORY_NAME:
         description: "GitHub Repository Name"
         required: true
         type: string
@@ -18,6 +18,6 @@ jobs:
     name: SonarCloud Analysis
     uses: Pesquisa-e-Inovacao-Grupo-8/TEMPLATES-PIPELINES/.github/workflows/sonarqube.yml@main
     with:
-      GITHUB_REPOSITORY: ${{ inputs.GITHUB_REPOSITORY }}
+      GITHUB_REPOSITORY: ${{ inputs.GITHUB_REPOSITORY_NAME }}
       GITHUB_ORGANIZATION: ${{ inputs.GITHUB_ORGANIZATION }}
     secrets: inherit
