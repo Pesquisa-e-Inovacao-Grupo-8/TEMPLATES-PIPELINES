@@ -42,7 +42,7 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           GITHUB_ORGANIZATION: ${{ inputs.GITHUB_ORGANIZATION }}
-          GITHUB_REPOSITORY_NAME: ${{ inputs.GITHUB_REPOSITORY }}
+          GITHUB_REPOSITORY_NAME: ${{ inputs.GITHUB_REPOSITORY_NAME }}
         run: |
           GITHUB_ORGANIZATION=$(echo "$GITHUB_ORGANIZATION" | tr '[:upper:]' '[:lower:]')
 
