@@ -15,10 +15,10 @@ on:
 
 jobs:
   deploy:
-    runs-on: [self-hosted, Linux, X64, self-hosted-public-ec2]
+    runs-on: self-hosted
 
     steps:
-      - name: ECHO TESTE - EC2 RUNNER
+      - name: Test Runner
         run: |
-          echo "GITHUB_REPOSITORY: ${{ inputs.GITHUB_REPOSITORY_NAME }}"
-          echo "GITHUB_ORGANIZATION: ${{ inputs.GITHUB_ORGANIZATION }}"
+          echo "Runner funcionando!"
+          hostname
