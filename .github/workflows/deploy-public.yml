@@ -7,19 +7,18 @@ on:
         description: "GitHub Repository Name"
         required: true
         type: string
+
       GITHUB_ORGANIZATION:
         description: "GitHub Organization Name"
         required: true
         type: string
-
 
 jobs:
   deploy:
     runs-on: self-hosted-public-ec2
 
     steps:
-      teste:
-        name: ECHO TESTE - EC2 RUNNER
+      - name: ECHO TESTE - EC2 RUNNER
         run: |
           echo "GITHUB_REPOSITORY: ${{ inputs.GITHUB_REPOSITORY_NAME }}"
           echo "GITHUB_ORGANIZATION: ${{ inputs.GITHUB_ORGANIZATION }}"
