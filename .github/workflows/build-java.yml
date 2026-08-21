@@ -1,0 +1,16 @@
+name: Build
+
+on:
+  workflow_call:
+    inputs:
+      sonar_project_key:
+        description: "SonarCloud Project Key"
+        required: true
+        type: string
+        
+jobs:
+  sonar:
+    uses: Pesquisa-e-Inovacao-Grupo-8/TEMPLATES-PIPELINES/.github/workflows/sonarqube.yml@main
+    with:
+      sonar_project_key: ${{ inputs.sonar_project_key }}
+    secrets: inherit
