@@ -30,6 +30,6 @@ jobs:
 
   deploy:
     name: Deploy to EC2 - PUBLIC
-    uses: Pesquisa-e-Inovacao-Grupo-8/TEMPLATES-PIPELINES/.github/workflows/deploy_public_ec2.yml@main
+    uses: Pesquisa-e-Inovacao-Grupo-8/TEMPLATES-PIPELINES/.github/workflows/deploy-public.yml@main
 
 
