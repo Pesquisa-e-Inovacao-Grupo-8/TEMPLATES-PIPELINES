@@ -18,6 +18,7 @@ jobs:
     name: SonarCloud Analysis
     uses: Pesquisa-e-Inovacao-Grupo-8/TEMPLATES-PIPELINES/.github/workflows/sonarqube.yml@main
     with:
+      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       GITHUB_REPOSITORY_NAME: ${{ inputs.GITHUB_REPOSITORY_NAME }}
       GITHUB_ORGANIZATION: ${{ inputs.GITHUB_ORGANIZATION }}
       
