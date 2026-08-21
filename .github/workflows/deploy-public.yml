@@ -15,7 +15,7 @@ on:
 
 jobs:
   deploy:
-    runs-on: self-hosted-public-ec2
+    runs-on: self-hosted
 
     steps:
       - name: ECHO TESTE - EC2 RUNNER
