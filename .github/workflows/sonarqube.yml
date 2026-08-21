@@ -3,8 +3,12 @@ name: SonarCloud analysis
 on:
   workflow_call:
     inputs:
-      sonar_project_key:
-        description: "SonarCloud Project Key"
+      GITHUB_REPOSITORY:
+        description: "GitHub Repository Name"
+        required: true
+        type: string
+      GITHUB_ORGANIZATION:
+        description: "GitHub Organization Name"
         required: true
         type: string
 
@@ -38,7 +42,8 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
+          GITHUB_ORGANIZATION=$(echo "${{ inputs.GITHUB_ORGANIZATION }}" | tr '[:upper:]' '[:lower:]')
           ./mvnw clean verify sonar:sonar \
-            -Dsonar.projectKey="${{ inputs.sonar_project_key }}" \
+            -Dsonar.projectKey="${{GITHUB_ORGANIZATION}}_${{inputs.GITHUB_REPOSITORY}}" \
             -Dsonar.organization="pesquisa-e-inovacao-grupo-8" \
             -Dsonar.token="$SONAR_TOKEN"

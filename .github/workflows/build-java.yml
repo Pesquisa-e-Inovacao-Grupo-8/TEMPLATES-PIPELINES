@@ -1,16 +1,23 @@
-name: Build
+name: BUILD JAVA - DOCKER
 
 on:
   workflow_call:
     inputs:
-      sonar_project_key:
-        description: "SonarCloud Project Key"
+      GITHUB_REPOSITORY:
+        description: "GitHub Repository Name"
+        required: true
+        type: string
+      GITHUB_ORGANIZATION:
+        description: "GitHub Organization Name"
         required: true
         type: string
         
 jobs:
-  sonar:
+
+  sonarqube:
+    name: SonarCloud Analysis
     uses: Pesquisa-e-Inovacao-Grupo-8/TEMPLATES-PIPELINES/.github/workflows/sonarqube.yml@main
     with:
-      sonar_project_key: ${{ inputs.sonar_project_key }}
+      GITHUB_REPOSITORY: ${{ inputs.GITHUB_REPOSITORY }}
+      GITHUB_ORGANIZATION: ${{ inputs.GITHUB_ORGANIZATION }}
     secrets: inherit
