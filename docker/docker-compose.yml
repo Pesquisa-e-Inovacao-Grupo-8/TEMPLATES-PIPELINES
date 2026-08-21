@@ -1,0 +1,130 @@
+services:
+
+  # ==========================================
+  # BANCO DE DADOS - POSTGRESQL
+  # ==========================================
+
+  banco:
+    image: postgres:16
+    container_name: banco
+    restart: unless-stopped
+
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+
+    volumes:
+      - banco_data:/var/lib/postgresql/data
+
+    networks:
+      - app-network
+
+
+  # ==========================================
+  # BACKEND JAVA
+  # ==========================================
+
+  java:
+    image: SEU_USUARIO_DOCKERHUB/backend-java:latest
+    container_name: backend-java
+    restart: unless-stopped
+
+    depends_on:
+      - banco
+
+    environment:
+      DB_HOST: banco
+      DB_PORT: 5432
+      DB_NAME: ${POSTGRES_DB}
+      DB_USER: ${POSTGRES_USER}
+      DB_PASSWORD: ${POSTGRES_PASSWORD}
+
+    ports:
+      - "8080:8080"
+
+    networks:
+      - app-network
+
+
+  # ==========================================
+  # PYTHON 1
+  # ==========================================
+
+  python-1:
+    image: SEU_USUARIO_DOCKERHUB/python-1:latest
+    container_name: python-1
+    restart: unless-stopped
+
+    depends_on:
+      - banco
+
+    environment:
+      DB_HOST: banco
+      DB_PORT: 5432
+      DB_NAME: ${POSTGRES_DB}
+      DB_USER: ${POSTGRES_USER}
+      DB_PASSWORD: ${POSTGRES_PASSWORD}
+
+    networks:
+      - app-network
+
+
+  # ==========================================
+  # PYTHON 2
+  # ==========================================
+
+  python-2:
+    image: SEU_USUARIO_DOCKERHUB/python-2:latest
+    container_name: python-2
+    restart: unless-stopped
+
+    depends_on:
+      - banco
+
+    environment:
+      DB_HOST: banco
+      DB_PORT: 5432
+      DB_NAME: ${POSTGRES_DB}
+      DB_USER: ${POSTGRES_USER}
+      DB_PASSWORD: ${POSTGRES_PASSWORD}
+
+    networks:
+      - app-network
+
+
+  # ==========================================
+  # FRONTEND
+  # ==========================================
+
+  frontend:
+    image: SEU_USUARIO_DOCKERHUB/frontend:latest
+    container_name: frontend
+    restart: unless-stopped
+
+    depends_on:
+      - java
+
+    ports:
+      - "80:80"
+
+    networks:
+      - app-network
+
+
+# ==========================================
+# VOLUMES
+# ==========================================
+
+volumes:
+  banco_data:
+
+
+# ==========================================
+# NETWORK
+# ==========================================
+
+networks:
+  app-network:
+    driver: bridge
+

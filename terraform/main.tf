@@ -14,6 +14,7 @@ resource "aws_internet_gateway" "gw" {
 resource "aws_subnet" "public_subnet" {
   vpc_id                  = aws_vpc.main.id
   cidr_block              = var.public_subnet_cidr
+  availability_zone       = "us-east-1a"
   map_public_ip_on_launch = true
 }
 
@@ -58,37 +59,24 @@ resource "aws_security_group" "ec2_sg" {
 }
 
 ##########################################
-# EC2 - ACCOUNT 1
+#         EC2 - ACCOUNT 1                # 
 ##########################################
 
 resource "aws_instance" "account1" {
-
   provider = aws.account1
-
   ami = data.aws_ami.ubuntu.id
-
   key_name = aws_key_pair.generated_key.key_name
-
   instance_type = var.instance_type
-
   subnet_id = aws_subnet.public_subnet.id
-
   vpc_security_group_ids = [aws_security_group.ec2_sg.id]
 
   root_block_device {
-
     volume_size = var.disk_size
-
     volume_type = var.disk_type
-
   }
 
   tags = {
-
     Name = "DEV-ACCOUNT1"
-
     Environment = "Desenvolvimento"
-
   }
-
 }

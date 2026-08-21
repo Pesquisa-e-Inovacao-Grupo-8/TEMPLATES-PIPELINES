@@ -1,4 +1,4 @@
----
+
 - name: Configurar servidor Ubuntu
   hosts: web
   become: true
@@ -12,6 +12,9 @@
       apt:
         update_cache: yes
         cache_valid_time: 3600
+
+    - name: Testar conexão
+      ansible.builtin.ping:
 
     - name: Atualizar pacotes do sistema
       apt:
@@ -41,7 +44,7 @@
         state: present
 
     ##########################################################
-    # Docker
+    #                     Docker                             #
     ##########################################################
 
     - name: Instalar Docker
@@ -63,7 +66,7 @@
         append: yes
 
     ##########################################################
-    # Docker Compose
+    #               Docker Compose                          #
     ##########################################################
 
     - name: Instalar Docker Compose Plugin
@@ -74,7 +77,7 @@
       ignore_errors: yes
 
     ##########################################################
-    # Java 21
+    #                    Java 21                            #
     ##########################################################
 
     - name: Instalar Java 21
@@ -84,7 +87,7 @@
         state: present
 
     ##########################################################
-    # PostgreSQL
+    #                  PostgreSQL                            #
     ##########################################################
 
     - name: Instalar PostgreSQL
@@ -101,7 +104,7 @@
         enabled: yes
 
     ##########################################################
-    # Node.js (React)
+    #                 Node.js (React)                        #
     ##########################################################
 
     - name: Adicionar repositório NodeSource
@@ -117,7 +120,7 @@
         state: present
 
     ##########################################################
-    # Atualizar npm
+    #                Atualizar npm                           #   
     ##########################################################
 
     - name: Atualizar npm
@@ -127,7 +130,7 @@
         state: latest
 
     ##########################################################
-    # Verificações
+    #               Verificações                             #
     ##########################################################
 
     - name: Verificar Docker
