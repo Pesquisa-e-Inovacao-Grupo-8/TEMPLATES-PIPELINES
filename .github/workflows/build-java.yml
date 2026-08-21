@@ -14,6 +14,16 @@ on:
         type: string
 
 jobs:
+
+  runner-test:
+    name: Runner Sanity Check
+    on: workflow_dispatch
+    jobs:
+      test:
+        runs-on: self-hosted
+        steps:
+          - run: echo "ok"; hostname
+
   sonarqube:
     name: SonarCloud Analysis
     uses: Pesquisa-e-Inovacao-Grupo-8/TEMPLATES-PIPELINES/.github/workflows/sonarqube.yml@main
