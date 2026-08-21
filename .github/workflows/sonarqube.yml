@@ -37,15 +37,21 @@ jobs:
 
       - name: Verify Java
         run: java -version
-        
+
       - name: SonarCloud
         env:
+          GITHUB_REPOSITORY: ${{ inputs.GITHUB_REPOSITORY }}
+          GITHUB_ORGANIZATION: ${{ inputs.GITHUB_ORGANIZATION }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
           GITHUB_ORGANIZATION=$(echo "${{ inputs.GITHUB_ORGANIZATION }}" | tr '[:upper:]' '[:lower:]')
 
+            echo "GITHUB_REPOSITORY: $GITHUB_REPOSITORY"
+            echo "GITHUB_ORGANIZATION: $GITHUB_ORGANIZATION"
+            echo "SONAR_PROJECT_KEY: ${GITHUB_ORGANIZATION}_$GITHUB_REPOSITORY"
+
           ./mvnw clean verify sonar:sonar \
-            -Dsonar.projectKey="${GITHUB_ORGANIZATION}_${{ inputs.GITHUB_REPOSITORY }}" \
+            -Dsonar.projectKey="${GITHUB_ORGANIZATION}_${GITHUB_REPOSITORY}" \
             -Dsonar.organization="pesquisa-e-inovacao-grupo-8" \
             -Dsonar.token="$SONAR_TOKEN"
 
