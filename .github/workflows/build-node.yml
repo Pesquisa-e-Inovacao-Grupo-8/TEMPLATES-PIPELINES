@@ -1,4 +1,4 @@
-name: BUILD JAVA - DOCKER
+name: BUILD NODE - DOCKER
 
 on:
   workflow_call:
