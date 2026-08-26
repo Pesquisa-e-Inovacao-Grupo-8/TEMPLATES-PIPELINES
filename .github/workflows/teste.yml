@@ -6,6 +6,10 @@ on:
 jobs:
   teste-conexao:
     runs-on: [self-hosted, Linux, X64]
+  secrets:
+    EC2_PRIVATE_IP:
+      description: 'IP privado da instância EC2'
+      required: true
 
     steps:
       - name: Test Runner
