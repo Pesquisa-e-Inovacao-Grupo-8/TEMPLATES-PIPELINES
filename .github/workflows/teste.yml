@@ -10,5 +10,4 @@ jobs:
     steps:
       - name: Test Runner
         run: |
-          ssh -i "vm-ec2-default-key.pem" ubuntu@ec2${{ secrets.EC2_PUBLIC_IP }}.compute-1.amazonaws.com
           mkdir TESTE
