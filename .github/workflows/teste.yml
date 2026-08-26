@@ -11,6 +11,6 @@ jobs:
       - name: Test Runner
         run: |
            ssh -i "/home/ubuntu/.ssh/vm-ec2-default-key.pem" ubuntu@${{ secrets.EC2_PRIVATE_DNS }}
-           ll
+           ls -la
            mkdir teste
 
