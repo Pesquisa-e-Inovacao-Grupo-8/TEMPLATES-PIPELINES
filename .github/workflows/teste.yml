@@ -12,10 +12,10 @@ jobs:
         shell: bash
         run: |
            ssh -i "/home/ubuntu/.ssh/vm-ec2-default-key.pem" ubuntu@${{ secrets.EC2_PRIVATE_DNS }} << 'EOF'
-           
+           "
            pwd
            ls -la
            mkdir teste
-           
-           EOF
+           "
+           EO
 
