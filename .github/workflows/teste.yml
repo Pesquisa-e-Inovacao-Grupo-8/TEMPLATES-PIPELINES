@@ -10,6 +10,6 @@ jobs:
     steps:
       - name: Test Runner
         run: |
-           ssh -i "/home/ubuntu/.ssh/vm-ec2-default-key.pem" ubuntu@ec2-${{ secrets.EC2_PRIVATE_IP }}.compute-1.amazonaws.com
+           ssh -i "/home/ubuntu/.ssh/vm-ec2-default-key.pem" ubuntu@ec2-10-0-1-142.compute-1.amazonaws.com
            mkdir TETSE-SSH-FUNCIONOU
 
