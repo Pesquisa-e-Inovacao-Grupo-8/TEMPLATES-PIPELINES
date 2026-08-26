@@ -1,0 +1,87 @@
+name: Deploy to EC2 - PUBLIC
+
+on:
+  workflow_call:
+    inputs:
+      GITHUB_REPOSITORY_NAME:
+        description: "GitHub Repository Name"
+        required: true
+        type: string
+
+      GITHUB_ORGANIZATION:
+        description: "GitHub Organization Name"
+        required: true
+        type: string
+
+jobs:
+  deploy:
+    runs-on: [self-hosted, Linux, X64]
+
+    steps:
+
+     teste-conexao:
+      - name: Test Connection 
+        shell: bash
+        run: |
+           ssh -i "/home/ubuntu/.ssh/vm-ec2-default-key.pem" ubuntu@${{ secrets.EC2_PRIVATE_DNS }} << 'EOF' 
+           
+           hostname
+           echo "Deploying $GITHUB_REPOSITORY_NAME to EC2 Private Instance"
+           echo "GitHub Organization: $GITHUB_ORGANIZATION"
+           echo "GitHub Repository: $GITHUB_REPOSITORY_NAME"
+           echo "GitHub Run Number: $GITHUB_RUN_NUMBER"
+           echo "GitHub Run ID: $GITHUB_RUN_ID"
+           echo "TESTE BEM SUCEDIDO"
+
+           EOF 
+
+     comfirm-project-directory:
+      - name: Confirm Project Directory
+        needs: teste-conexao
+        shell: bash
+        run: |
+           ssh -i "/home/ubuntu/.ssh/vm-ec2-default-key.pem" ubuntu@${{ secrets.EC2_PRIVATE_DNS }} << 'EOF' 
+           
+           
+
+            PROJECT_DIR="/home/ubuntu/${{ github.event.repository.name }}"
+
+            if [ -d "$PROJECT_DIR" ]; then
+              echo "Diretório já existe: $PROJECT_DIR"
+            else
+              echo "Diretório não existe. Criando..."
+              mkdir -p "$PROJECT_DIR"
+            fi
+
+            cd "$PROJECT_DIR"
+
+            echo "Diretório atual:"
+            pwd
+
+            echo "Conteúdo:"
+            ls -la
+
+            EOF
+
+    #  deploy-application:
+    #   - name: Deploy Application
+    #     needs: teste-conexao
+    #     shell: bash
+    #     run: |
+    #        ssh -i "/home/ubuntu/.ssh/vm-ec2-default-key.pem" ubuntu@${{ secrets.EC2_PRIVATE_DNS }} << 'EOF' 
+           
+    #        cd /home/ubuntu/@{GITHUB_REPOSITORY_NAME}
+
+    #        # Atualiza a tag da imagem no docker-compose.yml
+    #        sed -i "s|image: ${{ secrets.DOCKERHUB_USERNAME }}/$GITHUB_REPOSITORY_NAME:.*|image: ${{ secrets.DOCKERHUB_USERNAME }}/$GITHUB_REPOSITORY_NAME:${{ github.run_number }}|" docker-compose.yml
+
+    #        # Baixa a nova imagem
+    #        docker compose pull
+
+    #        # Reinicia os containers
+    #        docker compose down
+    #        docker compose up -d
+
+    #        EOF
+
+
