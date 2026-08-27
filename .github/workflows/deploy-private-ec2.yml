@@ -12,10 +12,6 @@ on:
         description: "GitHub Organization Name"
         required: true
         type: string
-      EC2_PRIVATE_DNS:
-        description: "EC2 Private DNS"
-        required: true
-        type: string
 
 jobs:
 
