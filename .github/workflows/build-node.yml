@@ -15,13 +15,13 @@ on:
 
 jobs:
 
-  sonarqube:
-    name: SonarCloud Analysis
-    uses: Pesquisa-e-Inovacao-Grupo-8/TEMPLATES-PIPELINES/.github/workflows/sonarqube.yml@main
-    with:
-      GITHUB_REPOSITORY_NAME: ${{ inputs.GITHUB_REPOSITORY_NAME }}
-      GITHUB_ORGANIZATION: ${{ inputs.GITHUB_ORGANIZATION }}
-    secrets: inherit
+  # sonarqube:
+  #   name: SonarCloud Analysis
+  #   uses: Pesquisa-e-Inovacao-Grupo-8/TEMPLATES-PIPELINES/.github/workflows/sonarqube.yml@main
+  #   with:
+  #     GITHUB_REPOSITORY_NAME: ${{ inputs.GITHUB_REPOSITORY_NAME }}
+  #     GITHUB_ORGANIZATION: ${{ inputs.GITHUB_ORGANIZATION }}
+  #   secrets: inherit
 
   docker:
     name: Docker Build
