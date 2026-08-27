@@ -32,7 +32,7 @@ jobs:
   #     GITHUB_ORGANIZATION: ${{ inputs.GITHUB_ORGANIZATION }}
 
   deploy:
-    name: Deploy to EC2 - PUBLIC
+    name: Deploy to EC2 - PRIVATE
     needs: sonarqube
     uses: Pesquisa-e-Inovacao-Grupo-8/TEMPLATES-PIPELINES/.github/workflows/deploy-private-ec2.yml@main
     with:
