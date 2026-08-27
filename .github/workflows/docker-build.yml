@@ -1,7 +1,17 @@
 name: Build and Push - Docker Hub
 
 on:
-  workflow_dispatch:
+  workflow_call:
+    inputs:
+      GITHUB_REPOSITORY_NAME:
+        description: "GitHub Repository Name"
+        required: true
+        type: string
+
+      GITHUB_ORGANIZATION:
+        description: "GitHub Organization Name"
+        required: true
+        type: string
       
 jobs:
 
