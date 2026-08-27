@@ -39,13 +39,17 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build Docker Image & Push to Docker Hub
+      - name: Build and Push Docker Images
         run: |
-          echo "GITHUB_REPOSITORY: $GITHUB_REPOSITORY_NAME"
-          echo "GITHUB_ORGANIZATION: $GITHUB_ORGANIZATION"
+          DOCKERHUB_USERNAME_CLEAN=$(echo -n "$DOCKERHUB_USERNAME" | tr -d '\r\n')
+          GITHUB_REPOSITORY_NAME_CLEAN=$(echo -n "$GITHUB_REPOSITORY_NAME" | tr -d '\r\n')
 
-          docker build \
-            --tag "$DOCKERHUB_USERNAME/$GITHUB_REPOSITORY_NAME:${{ github.run_number }}" \
-            .
+          echo "Repository: $GITHUB_REPOSITORY_NAME_CLEAN"
+          echo "Organization: $GITHUB_ORGANIZATION"
 
-          docker push "$DOCKERHUB_USERNAME/$GITHUB_REPOSITORY_NAME:${{ github.run_number }}"
+          IMAGE="$DOCKERHUB_USERNAME_CLEAN/$GITHUB_REPOSITORY_NAME_CLEAN:${{ github.run_number }}"
+
+          echo "Image: $IMAGE"
+
+          docker build -t "$IMAGE" .
+          docker push "$IMAGE"
