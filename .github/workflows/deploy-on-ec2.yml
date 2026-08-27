@@ -13,7 +13,7 @@ on:
         required: true
         type: string
     secrets:
-      EC2_PRIVATE_DNS:
+      EC2_DNS:
         description: "EC2 Private DNS"
         required: true
 
@@ -24,7 +24,7 @@ jobs:
       - name: Test Connection
         shell: bash
         run: |
-          ssh -i "/home/ubuntu/.ssh/vm-ec2-default-key.pem" ubuntu@${{ secrets.EC2_PRIVATE_DNS }} << 'EOF'
+          ssh -i "/home/ubuntu/.ssh/vm-ec2-default-key.pem" ubuntu@${{ secrets.EC2_DNS }} << 'EOF'
 
           hostname
           echo "Deploying ${{ inputs.GITHUB_REPOSITORY_NAME }} to EC2 Private Instance"
@@ -39,7 +39,7 @@ jobs:
       - name: Deploy Application
         shell: bash
         run: |
-          ssh -i "/home/ubuntu/.ssh/vm-ec2-default-key.pem" ubuntu@${{ secrets.EC2_PRIVATE_DNS }} << 'EOF'
+          ssh -i "/home/ubuntu/.ssh/vm-ec2-default-key.pem" ubuntu@${{ secrets.EC2_DNS }} << 'EOF'
 
           PROJECT_DIR="/home/ubuntu/${{ inputs.GITHUB_REPOSITORY_NAME }}"
 
