@@ -14,7 +14,7 @@ on:
         type: string
     secrets:
       EC2_DNS:
-        description: "EC2 Private DNS"
+        description: "EC2 DNS"
         required: true
 
 jobs:
