@@ -49,8 +49,8 @@ jobs:
 
           echo "Iniciando deploy..."
 
-          USERNAME=$(echo -n "$DOCKERHUB_USERNAME" | tr -d '\r\n')
-          REPOSITORY=$(echo -n "$GITHUB_REPOSITORY_NAME" | tr -d '\r\n' | tr '[:upper:]' '[:lower:]')
+          USERNAME=$(echo -n "${{ secrets.DOCKERHUB_USERNAME }}" | tr -d '\r\n')
+          REPOSITORY=$(echo -n "${{ inputs.GITHUB_REPOSITORY_NAME }}" | tr -d '\r\n' | tr '[:upper:]' '[:lower:]')
 
           IMAGE="$USERNAME/$REPOSITORY:${{ github.run_number }}"
 
