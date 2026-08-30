@@ -42,7 +42,7 @@ jobs:
           ssh \
             -i "/home/ubuntu/.ssh/vm-key-pair.pem" \
             -o StrictHostKeyChecking=no \
-            ubuntu@${{ secrets.EC2_PRIVATE_DNS }} << 'EOF'
+            ubuntu@${{ secrets.EC2_DNS }} << 'EOF'
 
           sudo apt update
           sudo apt install -y docker.io docker-compose
