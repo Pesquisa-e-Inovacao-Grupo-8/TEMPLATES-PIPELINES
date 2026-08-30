@@ -31,11 +31,11 @@ jobs:
       GITHUB_ORGANIZATION: ${{ inputs.GITHUB_ORGANIZATION }}
     secrets: inherit
 
-  ansible:
-    name: Ansible Playbook
-    uses: Pesquisa-e-Inovacao-Grupo-8/TEMPLATES-PIPELINES/.github/workflows/ansible-deploy-ec2.yml@main
-    secrets: 
-      EC2_DNS: ${{ secrets.EC2_PUBLIC_DNS }}
+# ansible:
+#   name: Ansible Playbook
+#    uses: Pesquisa-e-Inovacao-Grupo-8/TEMPLATES-PIPELINES/.github/workflows/ansible-dep.yml@main
+#   secrets: 
+#      EC2_DNS: ${{ secrets.EC2_PUBLIC_DNS }}
 
   deploy:
     name: Deploy to EC2 - PUBLIC
