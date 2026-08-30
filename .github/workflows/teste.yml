@@ -11,7 +11,7 @@ jobs:
       - name: Test Runner
         shell: bash
         run: |
-           ssh -i "/home/ubuntu/.ssh/vm-ec2-default-key.pem" ubuntu@${{ secrets.EC2_PRIVATE_DNS }} << 'EOF'
+           ssh -i "/home/ubuntu/.ssh/vm-key-pair.pem" ubuntu@${{ secrets.EC2_PRIVATE_DNS }} << 'EOF'
            "
            pwd
            ls -la
