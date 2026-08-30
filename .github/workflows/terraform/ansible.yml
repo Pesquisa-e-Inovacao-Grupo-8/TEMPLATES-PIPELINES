@@ -78,7 +78,7 @@ jobs:
           IP="${{ inputs.ec2_public_ip }}"
 
           ansible-playbook \
-            -i "${IP}," \
+            -i "${IP}," \\
             -u ubuntu \
             --private-key ~/.ssh/ec2_key \
             ansible/playbook.yml

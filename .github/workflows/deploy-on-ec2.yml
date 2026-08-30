@@ -54,6 +54,9 @@ jobs:
 
           docker pull "$IMAGE"
 
+          sed -i "s|image:.*|image: $IMAGE|g" docker-compose.yml
 
+          docker-compose down
+          docker-compose up -d
 
           EOF
