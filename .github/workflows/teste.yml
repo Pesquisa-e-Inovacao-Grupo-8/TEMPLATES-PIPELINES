@@ -11,11 +11,15 @@ jobs:
       - name: Test Runner
         shell: bash
         run: |
-           ssh -i "/home/ubuntu/.ssh/vm-key-pair.pem" ubuntu@${{ secrets.EC2_PRIVATE_DNS }} << 'EOF'
-           "
-           pwd
-           ls -la
-           mkdir teste
-           "
-           EOF
+          ssh \
+            -i "/home/ubuntu/.ssh/vm-key-pair.pem" \
+            -o StrictHostKeyChecking=no \
+            ubuntu@${{ secrets.EC2_PRIVATE_DNS }} << 'EOF'
 
+          echo "Conectado na EC2"
+          pwd
+          ls -la
+          mkdir -p teste
+          ls -la
+
+          EOF
