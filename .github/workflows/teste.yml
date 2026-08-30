@@ -17,5 +17,5 @@ jobs:
            ls -la
            mkdir teste
            "
-           EO
+           EOF
 
