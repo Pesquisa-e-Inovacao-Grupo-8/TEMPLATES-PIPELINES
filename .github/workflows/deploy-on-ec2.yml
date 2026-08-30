@@ -19,7 +19,7 @@ on:
 
 jobs:
   deploy-ec2-private:
-    runs-on: [self-hosted, Linux, X64]
+    runs-on: vm-ec2-runner-aws
     steps:
       - name: Test Connection
         shell: bash
