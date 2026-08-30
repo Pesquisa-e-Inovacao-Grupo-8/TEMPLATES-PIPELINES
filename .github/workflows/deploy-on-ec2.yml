@@ -16,28 +16,14 @@ on:
       EC2_DNS:
         description: "EC2 DNS"
         required: true
-
+      DOCKERHUB_USERNAME:
+        description: "Docker Hub Username"
+        required: true
+      
 jobs:
   deploy-ec2-private:
     runs-on: vm-ec2-runner-aws
     steps:
-      - name: Test Connection
-        shell: bash
-        run: |
-          ssh \
-            -i "/home/ubuntu/.ssh/vm-key-pair.pem" \
-            -o StrictHostKeyChecking=no \
-            ubuntu@${{ secrets.EC2_DNS }} << 'EOF'
-
-          hostname
-          echo "Deploying ${{ inputs.GITHUB_REPOSITORY_NAME }} to EC2 Private Instance"
-          echo "GitHub Organization: ${{ inputs.GITHUB_ORGANIZATION }}"
-          echo "GitHub Repository: ${{ inputs.GITHUB_REPOSITORY_NAME }}"
-          echo "GitHub Run Number: ${{ github.run_number }}"
-          echo "GitHub Run ID: ${{ github.run_id }}"
-          echo "TESTE BEM SUCEDIDO"
-
-          EOF
 
       - name: Deploy Application
         shell: bash
@@ -51,7 +37,6 @@ jobs:
           sudo apt install -y docker.io docker-compose
 
           PROJECT_DIR="/home/ubuntu/${{ inputs.GITHUB_REPOSITORY_NAME }}"
-
 
           if [ -d "$PROJECT_DIR" ]; then
             echo "Diretório já existe: $PROJECT_DIR"
@@ -70,5 +55,7 @@ jobs:
           IMAGE="$USERNAME/$REPOSITORY:${{ github.run_number }}"
 
           docker pull "$IMAGE"
+
+          docker images
 
           EOF
