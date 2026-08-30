@@ -39,7 +39,10 @@ jobs:
       - name: Deploy Application
         shell: bash
         run: |
-          ssh -i "/home/ubuntu/.ssh/vm-key-pair.pem" ubuntu@${{ secrets.EC2_DNS }} << 'EOF'
+          ssh \
+            -i "/home/ubuntu/.ssh/vm-key-pair.pem" \
+            -o StrictHostKeyChecking=no \
+            ubuntu@${{ secrets.EC2_PRIVATE_DNS }} << 'EOF'
 
           sudo apt update
           sudo apt install -y docker.io docker-compose

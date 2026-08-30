@@ -24,7 +24,10 @@ jobs:
       - name: Test Connection
         shell: bash
         run: |
-          ssh -i "/home/ubuntu/.ssh/vm-key-pair.pem" ubuntu@${{ secrets.EC2_PRIVATE_DNS }} << 'EOF'
+          ssh \
+            -i "/home/ubuntu/.ssh/vm-key-pair.pem" \
+            -o StrictHostKeyChecking=no \
+            ubuntu@${{ secrets.EC2_PRIVATE_DNS }} << 'EOF'
 
           hostname
           echo "Deploying ${{ inputs.GITHUB_REPOSITORY_NAME }} to EC2 Private Instance"
@@ -39,7 +42,10 @@ jobs:
       - name: Deploy Application
         shell: bash
         run: |
-          ssh -i "/home/ubuntu/.ssh/vm-key-pair.pem" ubuntu@${{ secrets.EC2_PRIVATE_DNS }} << 'EOF'
+          ssh \
+            -i "/home/ubuntu/.ssh/vm-key-pair.pem" \
+            -o StrictHostKeyChecking=no \
+            ubuntu@${{ secrets.EC2_PRIVATE_DNS }} << 'EOF'
 
           PROJECT_DIR="/home/ubuntu/${{ inputs.GITHUB_REPOSITORY_NAME }}"
 
