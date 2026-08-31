@@ -22,7 +22,7 @@ on:
       
 jobs:
   deploy-ec2-dev:
-    name: Deploy to EC2 - DEVELOPMENT
+    name: Deploy to EC2 - DEV
     runs-on: vm-ec2-runner-aws
     
     steps:
@@ -62,7 +62,7 @@ jobs:
           EOF
 
   deploy-ec2-prd:
-    name: Deploy to EC2 - PRODUCTION
+    name: Deploy to EC2 - PRD
     needs: deploy-ec2-dev
     runs-on: vm-ec2-runner-aws
     if: ${{ github.ref == 'refs/heads/main' }}

@@ -21,7 +21,7 @@ on:
 
 jobs:
   docker:
-    name: Build Docker Images
+    name: Build & Push - DOCKER
     runs-on: ubuntu-latest
 
     env:
