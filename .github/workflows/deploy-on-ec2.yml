@@ -21,14 +21,12 @@ on:
         required: true
       
 jobs:
-
   deploy-ec2-private:
     name: Deploy to EC2
     runs-on: vm-ec2-runner-aws
-    enviroment: PRD
-  
-    steps:
+    environment: PRD
 
+    steps:
       - name: Deploy Application
         shell: bash
         run: |
