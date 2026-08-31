@@ -19,6 +19,7 @@ on:
 jobs:
   build-deploy-prd:
     name: PYTHON-PIPELINE
+    runs-on: ubuntu-latest
     environment: PRD
 
     sonarqube:
