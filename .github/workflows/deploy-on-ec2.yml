@@ -21,7 +21,7 @@ on:
         required: true
       
 jobs:
-  deploy-ec2-private:
+  deploy-ec2-dev:
     name: Deploy to EC2
     runs-on: vm-ec2-runner-aws
     if: ${{ github.ref == 'refs/heads/develop' }}
@@ -62,7 +62,7 @@ jobs:
 
           EOF
 
-  deploy-ec2-private:
+  deploy-ec2-prd:
     name: Deploy to EC2
     runs-on: vm-ec2-runner-aws
     if: ${{ github.ref == 'refs/heads/main' }}
