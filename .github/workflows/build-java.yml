@@ -30,10 +30,11 @@ jobs:
     with:
       GITHUB_REPOSITORY_NAME: ${{ inputs.GITHUB_REPOSITORY_NAME }}
       GITHUB_ORGANIZATION: ${{ inputs.GITHUB_ORGANIZATION }}
+    secrets: inherit
 
   deploy:
     name: Deploy to EC2 - PRIVATE
-    needs: sonarqube
+    needs: docker
     uses: Pesquisa-e-Inovacao-Grupo-8/TEMPLATES-PIPELINES/.github/workflows/deploy-on-ec2.yml@main
     with:
       GITHUB_REPOSITORY_NAME: ${{ inputs.GITHUB_REPOSITORY_NAME }}
