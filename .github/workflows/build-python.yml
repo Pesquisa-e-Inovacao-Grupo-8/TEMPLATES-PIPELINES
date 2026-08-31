@@ -13,7 +13,12 @@ on:
         required: true
         type: string
 
+# CRIAR ENVIROMENTS EM TODOS OS REPOS QUE FAZEM DEPLOY
+# ALTERAR SECRETS DNS PARA EC2_PUBLIC_DNS_PRD E EC2_PRIVATE_DNS_PRD | EC2_PUBLIC_DNS_DEV E EC2_PRIVATE_DNS_DEV
+#EX ENVIROMENT
 jobs:
+  if: ${{ heads == 'origin/main' }}
+  enviroment: PRD
 
   sonarqube:
     name: SonarCloud Analysis
@@ -41,4 +46,3 @@ jobs:
     secrets:
       EC2_DNS: ${{ secrets.EC2_PRIVATE_DNS }}
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
-
