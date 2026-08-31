@@ -7,68 +7,66 @@ on:
         description: "GitHub Repository Name"
         required: true
         type: string
-
       GITHUB_ORGANIZATION:
         description: "GitHub Organization Name"
         required: true
         type: string
 
-# CRIAR ENVIROMENTS EM TODOS OS REPOS QUE FAZEM DEPLOY
-# ALTERAR SECRETS DNS PARA EC2_PUBLIC_DNS_PRD E EC2_PRIVATE_DNS_PRD | EC2_PUBLIC_DNS_DEV E EC2_PRIVATE_DNS_DEV
-
 jobs:
-  build-python-dev:
-    name: DEV
-    runs-on: ubuntu-latest
-    steps:
+  # ---------- DEV ----------
+  dev-sonarqube:
+    name: DEV - SonarCloud Analysis
+    uses: Pesquisa-e-Inovacao-Grupo-8/TEMPLATES-PIPELINES/.github/workflows/sonarqube-python.yml@main
+    with:
+      GITHUB_REPOSITORY_NAME: ${{ inputs.GITHUB_REPOSITORY_NAME }}
+      GITHUB_ORGANIZATION: ${{ inputs.GITHUB_ORGANIZATION }}
+    secrets: inherit
 
-      - uses: Pesquisa-e-Inovacao-Grupo-8/TEMPLATES-PIPELINES/.github/workflows/sonarqube-python.yml@main
-        name: SonarCloud Analysis
-        env:
-          GITHUB_REPOSITORY_NAME: ${{ inputs.GITHUB_REPOSITORY_NAME }}
-          GITHUB_ORGANIZATION: ${{ inputs.GITHUB_ORGANIZATION }}
+  dev-docker-build:
+    name: DEV - Docker Build
+    needs: dev-sonarqube
+    uses: Pesquisa-e-Inovacao-Grupo-8/TEMPLATES-PIPELINES/.github/workflows/docker-build.yml@main
+    with:
+      GITHUB_REPOSITORY_NAME: ${{ inputs.GITHUB_REPOSITORY_NAME }}
+      GITHUB_ORGANIZATION: ${{ inputs.GITHUB_ORGANIZATION }}
+    secrets: inherit
 
+  dev-deploy:
+    name: DEV - Deploy to EC2
+    needs: dev-docker-build
+    uses: Pesquisa-e-Inovacao-Grupo-8/TEMPLATES-PIPELINES/.github/workflows/deploy-on-ec2.yml@main
+    with:
+      GITHUB_REPOSITORY_NAME: ${{ inputs.GITHUB_REPOSITORY_NAME }}
+      GITHUB_ORGANIZATION: ${{ inputs.GITHUB_ORGANIZATION }}
+    secrets: inherit
 
-      - uses: Pesquisa-e-Inovacao-Grupo-8/TEMPLATES-PIPELINES/.github/workflows/docker-build.yml@main
-        name: Docker Build
-        env:
-          GITHUB_REPOSITORY_NAME: ${{ inputs.GITHUB_REPOSITORY_NAME }}
-          GITHUB_ORGANIZATION: ${{ inputs.GITHUB_ORGANIZATION }}
-
-
-      - uses: Pesquisa-e-Inovacao-Grupo-8/TEMPLATES-PIPELINES/.github/workflows/deploy-on-ec2.yml@main
-        name: Deploy to EC2 - PUBLIC
-        env:
-          GITHUB_REPOSITORY_NAME: ${{ inputs.GITHUB_REPOSITORY_NAME }}
-          GITHUB_ORGANIZATION: ${{ inputs.GITHUB_ORGANIZATION }}
-          EC2_DNS: ${{ secrets.EC2_PRIVATE_DNS }}
-          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
-
-  build-python-prd:
-    name: PRD
-    runs-on: ubuntu-latest
-    needs: build-python-dev
+  # ---------- PRD ----------
+  prd-sonarqube:
+    name: PRD - SonarCloud Analysis
+    needs: dev-deploy
     environment: PRD
-    steps:
+    uses: Pesquisa-e-Inovacao-Grupo-8/TEMPLATES-PIPELINES/.github/workflows/sonarqube-python.yml@main
+    with:
+      GITHUB_REPOSITORY_NAME: ${{ inputs.GITHUB_REPOSITORY_NAME }}
+      GITHUB_ORGANIZATION: ${{ inputs.GITHUB_ORGANIZATION }}
+    secrets: inherit
 
-      - uses: Pesquisa-e-Inovacao-Grupo-8/TEMPLATES-PIPELINES/.github/workflows/sonarqube-python.yml@main
-        name: SonarCloud Analysis
-        env:
-          GITHUB_REPOSITORY_NAME: ${{ inputs.GITHUB_REPOSITORY_NAME }}
-          GITHUB_ORGANIZATION: ${{ inputs.GITHUB_ORGANIZATION }}
+  prd-docker-build:
+    name: PRD - Docker Build
+    needs: prd-sonarqube
+    environment: PRD
+    uses: Pesquisa-e-Inovacao-Grupo-8/TEMPLATES-PIPELINES/.github/workflows/docker-build.yml@main
+    with:
+      GITHUB_REPOSITORY_NAME: ${{ inputs.GITHUB_REPOSITORY_NAME }}
+      GITHUB_ORGANIZATION: ${{ inputs.GITHUB_ORGANIZATION }}
+    secrets: inherit
 
-
-      - uses: Pesquisa-e-Inovacao-Grupo-8/TEMPLATES-PIPELINES/.github/workflows/docker-build.yml@main
-        name: Docker Build
-        env:
-          GITHUB_REPOSITORY_NAME: ${{ inputs.GITHUB_REPOSITORY_NAME }}
-          GITHUB_ORGANIZATION: ${{ inputs.GITHUB_ORGANIZATION }}
-          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
-
-      - uses: Pesquisa-e-Inovacao-Grupo-8/TEMPLATES-PIPELINES/.github/workflows/deploy-on-ec2.yml@main
-        name: Deploy to EC2 - PUBLIC
-        env:
-          GITHUB_REPOSITORY_NAME: ${{ inputs.GITHUB_REPOSITORY_NAME }}
-          GITHUB_ORGANIZATION: ${{ inputs.GITHUB_ORGANIZATION }}
-          EC2_DNS: ${{ secrets.EC2_PRIVATE_DNS }}
-          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+  prd-deploy:
+    name: PRD - Deploy to EC2
+    needs: prd-docker-build
+    environment: PRD
+    uses: Pesquisa-e-Inovacao-Grupo-8/TEMPLATES-PIPELINES/.github/workflows/deploy-on-ec2.yml@main
+    with:
+      GITHUB_REPOSITORY_NAME: ${{ inputs.GITHUB_REPOSITORY_NAME }}
+      GITHUB_ORGANIZATION: ${{ inputs.GITHUB_ORGANIZATION }}
+    secrets: inherit
