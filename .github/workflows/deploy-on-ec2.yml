@@ -24,7 +24,8 @@ jobs:
   deploy-ec2-private:
     name: Deploy to EC2
     runs-on: vm-ec2-runner-aws
-
+    if: ${{ github.ref == 'refs/heads/develop' }}
+    
     steps:
       - name: Deploy Application
         shell: bash
@@ -33,6 +34,48 @@ jobs:
             -i "/home/ubuntu/.ssh/vm-key-pair.pem" \
             -o StrictHostKeyChecking=no \
             ubuntu@${{ secrets.EC2_DNS }} << 'EOF'
+
+          sudo apt update
+          sudo apt install -y docker.io docker-compose
+
+          PROJECT_DIR="/home/ubuntu/${{ inputs.GITHUB_REPOSITORY_NAME }}"
+
+          if [ -d "$PROJECT_DIR" ]; then
+            echo "Diretório já existe: $PROJECT_DIR"
+          else
+            echo "Diretório não existe. Criando..."
+            mkdir -p "$PROJECT_DIR"
+          fi
+
+          cd "$PROJECT_DIR"
+
+          USERNAME=$(echo -n "${{ secrets.DOCKERHUB_USERNAME }}" | tr -d '\r\n')
+          REPOSITORY=$(echo -n "${{ inputs.GITHUB_REPOSITORY_NAME }}" | tr -d '\r\n' | tr '[:upper:]' '[:lower:]')
+          IMAGE="$USERNAME/$REPOSITORY:${{ github.run_number }}"
+
+          docker pull "$IMAGE"
+
+          sed -i "s|image:.*|image: $IMAGE|g" docker-compose.yml
+
+          sudo docker compose down
+          sudo docker compose up -d
+
+          EOF
+
+  deploy-ec2-private:
+    name: Deploy to EC2
+    runs-on: vm-ec2-runner-aws
+    if: ${{ github.ref == 'refs/heads/main' }}
+    environment: PRD
+
+    steps:
+      - name: Deploy Application
+        shell: bash
+        run: |
+          ssh \
+            -i "/home/ubuntu/.ssh/vm-key-pair.pem" \
+            -o StrictHostKeyChecking=no \
+            ubuntu@${{ secrets.EC2_DNS_PRD }} << 'EOF'
 
           sudo apt update
           sudo apt install -y docker.io docker-compose
