@@ -22,23 +22,22 @@ jobs:
     runs-on: ubuntu-latest
     steps:
 
-      - name: SonarCloud Analysis
-        uses: Pesquisa-e-Inovacao-Grupo-8/TEMPLATES-PIPELINES/.github/workflows/sonarqube-python.yml@main
+      - uses: Pesquisa-e-Inovacao-Grupo-8/TEMPLATES-PIPELINES/.github/workflows/sonarqube-python.yml@main
+        name: SonarCloud Analysis
         with:
           GITHUB_REPOSITORY_NAME: ${{ inputs.GITHUB_REPOSITORY_NAME }}
           GITHUB_ORGANIZATION: ${{ inputs.GITHUB_ORGANIZATION }}
         secrets: inherit
 
-      - name: Docker Build
-        uses: Pesquisa-e-Inovacao-Grupo-8/TEMPLATES-PIPELINES/.github/workflows/docker-build.yml@main
+      - uses: Pesquisa-e-Inovacao-Grupo-8/TEMPLATES-PIPELINES/.github/workflows/docker-build.yml@main
+        name: Docker Build
         with:
           GITHUB_REPOSITORY_NAME: ${{ inputs.GITHUB_REPOSITORY_NAME }}
           GITHUB_ORGANIZATION: ${{ inputs.GITHUB_ORGANIZATION }}
         secrets: inherit
 
-      - name: Deploy to EC2 - PUBLIC
-        needs: docker
-        uses: Pesquisa-e-Inovacao-Grupo-8/TEMPLATES-PIPELINES/.github/workflows/deploy-on-ec2.yml@main
+      - uses: Pesquisa-e-Inovacao-Grupo-8/TEMPLATES-PIPELINES/.github/workflows/deploy-on-ec2.yml@main
+        name: Deploy to EC2 - PUBLIC
         with:
           GITHUB_REPOSITORY_NAME: ${{ inputs.GITHUB_REPOSITORY_NAME }}
           GITHUB_ORGANIZATION: ${{ inputs.GITHUB_ORGANIZATION }}
@@ -53,24 +52,23 @@ jobs:
     environment: PRD
     steps:
 
-      - name: SonarCloud Analysis
-        uses: Pesquisa-e-Inovacao-Grupo-8/TEMPLATES-PIPELINES/.github/workflows/sonarqube-python.yml@main
+      - uses: Pesquisa-e-Inovacao-Grupo-8/TEMPLATES-PIPELINES/.github/workflows/sonarqube-python.yml@main
+        name: SonarCloud Analysis
         with:
           GITHUB_REPOSITORY_NAME: ${{ inputs.GITHUB_REPOSITORY_NAME }}
           GITHUB_ORGANIZATION: ${{ inputs.GITHUB_ORGANIZATION }}
         secrets: inherit
 
 
-      - name: Docker Build
-        uses: Pesquisa-e-Inovacao-Grupo-8/TEMPLATES-PIPELINES/.github/workflows/docker-build.yml@main
+      - uses: Pesquisa-e-Inovacao-Grupo-8/TEMPLATES-PIPELINES/.github/workflows/docker-build.yml@main
+        name: Docker Build
         with:
           GITHUB_REPOSITORY_NAME: ${{ inputs.GITHUB_REPOSITORY_NAME }}
           GITHUB_ORGANIZATION: ${{ inputs.GITHUB_ORGANIZATION }}
         secrets: inherit
 
-      - name: Deploy to EC2 - PUBLIC
-        needs: docker
-        uses: Pesquisa-e-Inovacao-Grupo-8/TEMPLATES-PIPELINES/.github/workflows/deploy-on-ec2.yml@main
+      - uses: Pesquisa-e-Inovacao-Grupo-8/TEMPLATES-PIPELINES/.github/workflows/deploy-on-ec2.yml@main
+        name: Deploy to EC2 - PUBLIC
         with:
           GITHUB_REPOSITORY_NAME: ${{ inputs.GITHUB_REPOSITORY_NAME }}
           GITHUB_ORGANIZATION: ${{ inputs.GITHUB_ORGANIZATION }}
