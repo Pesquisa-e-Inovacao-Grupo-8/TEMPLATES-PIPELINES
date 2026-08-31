@@ -1,0 +1,50 @@
+name: BUILD NODE - DOCKER
+
+on:
+  workflow_call:
+    inputs:
+      GITHUB_REPOSITORY_NAME:
+        description: "GitHub Repository Name"
+        required: true
+        type: string
+
+      GITHUB_ORGANIZATION:
+        description: "GitHub Organization Name"
+        required: true
+        type: string
+
+jobs:
+
+  # sonarqube:
+  #   name: SonarCloud Analysis
+  #   uses: Pesquisa-e-Inovacao-Grupo-8/TEMPLATES-PIPELINES/.github/workflows/sonarqube.yml@main
+  #   with:
+  #     GITHUB_REPOSITORY_NAME: ${{ inputs.GITHUB_REPOSITORY_NAME }}
+  #     GITHUB_ORGANIZATION: ${{ inputs.GITHUB_ORGANIZATION }}
+  #   secrets: inherit
+
+  docker:
+    name: Docker Build
+    uses: Pesquisa-e-Inovacao-Grupo-8/TEMPLATES-PIPELINES/.github/workflows/docker-build.yml@main
+    with:
+      GITHUB_REPOSITORY_NAME: ${{ inputs.GITHUB_REPOSITORY_NAME }}
+      GITHUB_ORGANIZATION: ${{ inputs.GITHUB_ORGANIZATION }}
+    secrets: inherit
+
+# ansible:
+#   name: Ansible Playbook
+#    uses: Pesquisa-e-Inovacao-Grupo-8/TEMPLATES-PIPELINES/.github/workflows/ansible-dep.yml@main
+#   secrets: 
+#      EC2_DNS: ${{ secrets.EC2_PUBLIC_DNS }}
+
+  deploy:
+    name: Deploy to EC2 - PUBLIC
+    needs: docker
+    uses: Pesquisa-e-Inovacao-Grupo-8/TEMPLATES-PIPELINES/.github/workflows/deploy-on-ec2.yml@main
+    with:
+      GITHUB_REPOSITORY_NAME: ${{ inputs.GITHUB_REPOSITORY_NAME }}
+      GITHUB_ORGANIZATION: ${{ inputs.GITHUB_ORGANIZATION }}
+    secrets:
+      EC2_DNS: ${{ secrets.EC2_PRIVATE_DNS }}
+      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+
