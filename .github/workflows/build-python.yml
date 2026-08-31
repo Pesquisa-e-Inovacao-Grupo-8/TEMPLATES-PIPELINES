@@ -1,4 +1,4 @@
-name: BUILD NODE - DOCKER
+name: BUILD PYTHON - DOCKER
 
 on:
   workflow_call:

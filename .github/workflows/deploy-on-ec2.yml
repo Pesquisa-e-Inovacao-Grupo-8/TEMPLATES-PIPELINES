@@ -1,4 +1,4 @@
-name: Deploy to EC2 - PRIVATE
+name: Deploy to EC2
 
 on:
   workflow_call:
@@ -23,6 +23,7 @@ on:
 jobs:
 
   deploy-ec2-private:
+    name: Deploy to EC2
     runs-on: vm-ec2-runner-aws
     steps:
 
