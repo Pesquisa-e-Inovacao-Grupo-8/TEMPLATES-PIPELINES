@@ -22,7 +22,7 @@ on:
       
 jobs:
   deploy-ec2-dev:
-    name: Deploy to EC2 - DEV
+    name: Deploy to EC2 - QA
     runs-on: vm-ec2-runner-aws
     
     steps:
@@ -32,7 +32,7 @@ jobs:
           ssh \
             -i "/home/ubuntu/.ssh/vm-key-pair.pem" \
             -o StrictHostKeyChecking=no \
-            ubuntu@${{ secrets.EC2_DNS_DEV }} << 'EOF'
+            ubuntu@${{ secrets.EC2_DNS }} << 'EOF'
 
           sudo apt update
           sudo apt install -y docker.io docker-compose
