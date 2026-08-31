@@ -32,7 +32,7 @@ jobs:
           ssh \
             -i "/home/ubuntu/.ssh/vm-key-pair.pem" \
             -o StrictHostKeyChecking=no \
-            ubuntu@${{ secrets.EC2_DNS }} << 'EOF'
+            ubuntu@${{ secrets.EC2_DNS_DEV }} << 'EOF'
 
           sudo apt update
           sudo apt install -y docker.io docker-compose
@@ -103,3 +103,5 @@ jobs:
           sudo docker compose up -d
 
           EOF
+
+# CRIAR LOGICA DE ROLLBACK AQUI \/\/\/\/\/
