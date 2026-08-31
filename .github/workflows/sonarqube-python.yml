@@ -1,0 +1,59 @@
+name: SonarCloud analysis
+
+on:
+  workflow_call:
+    inputs:
+      GITHUB_REPOSITORY_NAME:
+        description: "GitHub Repository Name"
+        required: true
+        type: string
+      GITHUB_ORGANIZATION:
+        description: "GitHub Organization Name"
+        required: true
+        type: string
+
+    secrets:
+      SONAR_TOKEN:
+        required: true
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  ANALISE-SONAR:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.13'
+          cache: pip
+
+      - name: Verify Python
+        run: python --version
+
+      - name: SonarCloud
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          GITHUB_ORGANIZATION: ${{ inputs.GITHUB_ORGANIZATION }}
+          GITHUB_REPOSITORY_NAME: ${{ inputs.GITHUB_REPOSITORY_NAME }}
+        run: |
+          GITHUB_ORGANIZATION=$(echo "$GITHUB_ORGANIZATION" | tr '[:upper:]' '[:lower:]')
+
+          echo "GITHUB_REPOSITORY: $GITHUB_REPOSITORY_NAME"
+          echo "GITHUB_ORGANIZATION: $GITHUB_ORGANIZATION"
+          echo "SONAR_PROJECT_KEY: ${GITHUB_ORGANIZATION}_${GITHUB_REPOSITORY_NAME}"
+
+          ./mvnw clean verify sonar:sonar \
+            -Dsonar.projectKey="${GITHUB_ORGANIZATION}_${GITHUB_REPOSITORY_NAME}" \
+            -Dsonar.organization="$GITHUB_ORGANIZATION" \
+            -Dsonar.token="$SONAR_TOKEN"
+
+
+
+

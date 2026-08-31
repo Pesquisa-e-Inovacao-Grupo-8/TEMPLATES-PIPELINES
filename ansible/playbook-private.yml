@@ -1,0 +1,90 @@
+- name: Configurar servidor Ubuntu
+  hosts: web
+  become: true
+
+  tasks:
+
+    - name: Atualizar cache do apt
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600
+
+    - name: Testar conexão
+      ansible.builtin.ping:
+
+    - name: Atualizar pacotes do sistema
+      apt:
+        upgrade: dist
+
+    - name: Instalar dependências básicas
+      apt:
+        name:
+          - git
+          - curl
+          - wget
+          - unzip
+          - zip
+          - vim
+          - nano
+          - htop
+          - tree
+          - software-properties-common
+          - apt-transport-https
+          - ca-certificates
+          - gnupg
+          - lsb-release
+          - build-essential
+        state: present
+
+    - name: Instalar Docker
+      apt:
+        name:
+          - docker.io
+        state: present
+
+    - name: Iniciar Docker
+      service:
+        name: docker
+        state: started
+        enabled: yes
+
+    - name: Adicionar usuário ubuntu ao grupo docker
+      user:
+        name: ubuntu
+        groups: docker
+        append: yes
+
+    - name: Instalar Docker Compose Plugin
+      apt:
+        name:
+          - docker-compose-v2
+        state: present
+      ignore_errors: yes
+
+    - name: Instalar Java 21
+      apt:
+        name:
+          - openjdk-21-jdk
+        state: present
+
+    - name: Verificar Docker
+      command: docker --version
+      register: docker_version
+      changed_when: false
+
+    - name: Verificar Git
+      command: git --version
+      register: git_version
+      changed_when: false
+
+    - name: Verificar Java
+      command: java -version
+      register: java_version
+      changed_when: false
+      failed_when: false
+
+    - name: Exibir versões instaladas
+      debug:
+        msg:
+          - "{{ docker_version.stdout }}"
+          - "{{ git_version.stdout }}"

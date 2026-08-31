@@ -1,0 +1,10 @@
+  front-end-react:
+    image: imagestreampi/front-end-react:latest
+    container_name: front-end-react
+    restart: unless-stopped
+
+    ports:
+      - "80:80"
+
+    networks:
+      - app-network

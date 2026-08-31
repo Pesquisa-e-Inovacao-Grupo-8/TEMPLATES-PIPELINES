@@ -1,0 +1,20 @@
+
+  api-whatsapp:
+    image: imagestreampi/api-whatsapp:latest
+    container_name: api-whatsapp
+    restart: unless-stopped
+
+    networks:
+      - app-network
+
+
+  api-payment:
+    image: imagestreampi/api-payment:latest
+    container_name: api-payment
+    restart: unless-stopped
+
+    depends_on:
+      - api-whatsapp
+      
+    networks:
+      - app-network

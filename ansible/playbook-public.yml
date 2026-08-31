@@ -43,10 +43,6 @@
           - python3-venv
         state: present
 
-    ##########################################################
-    #                     Docker                             #
-    ##########################################################
-
     - name: Instalar Docker
       apt:
         name:
@@ -65,10 +61,6 @@
         groups: docker
         append: yes
 
-    ##########################################################
-    #               Docker Compose                          #
-    ##########################################################
-
     - name: Instalar Docker Compose Plugin
       apt:
         name:
@@ -76,19 +68,6 @@
         state: present
       ignore_errors: yes
 
-    ##########################################################
-    #                    Java 21                            #
-    ##########################################################
-
-    - name: Instalar Java 21
-      apt:
-        name:
-          - openjdk-21-jdk
-        state: present
-
-    ##########################################################
-    #                 Node.js (React)                        #
-    ##########################################################
 
     - name: Adicionar repositório NodeSource
       shell: |
@@ -102,35 +81,11 @@
           - nodejs
         state: present
 
-    ##########################################################
-    #                Atualizar npm                           #   
-    ##########################################################
-
     - name: Atualizar npm
       npm:
         name: npm
         global: yes
         state: latest
-
-    ##########################################################
-    #               Verificações                             #
-    ##########################################################
-
-    - name: Verificar Docker
-      command: docker --version
-      register: docker_version
-      changed_when: false
-
-    - name: Verificar Git
-      command: git --version
-      register: git_version
-      changed_when: false
-
-    - name: Verificar Java
-      command: java -version
-      register: java_version
-      changed_when: false
-      failed_when: false
 
     - name: Verificar Node
       command: node --version
@@ -152,7 +107,6 @@
         msg:
           - "{{ docker_version.stdout }}"
           - "{{ git_version.stdout }}"
-          - "{{ postgres_version.stdout }}"
           - "{{ node_version.stdout }}"
           - "{{ npm_version.stdout }}"
           - "{{ python_version.stdout }}"
