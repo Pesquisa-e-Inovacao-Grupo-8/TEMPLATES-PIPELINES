@@ -27,21 +27,20 @@ jobs:
         env:
           GITHUB_REPOSITORY_NAME: ${{ inputs.GITHUB_REPOSITORY_NAME }}
           GITHUB_ORGANIZATION: ${{ inputs.GITHUB_ORGANIZATION }}
-        secrets: inherit
+
 
       - uses: Pesquisa-e-Inovacao-Grupo-8/TEMPLATES-PIPELINES/.github/workflows/docker-build.yml@main
         name: Docker Build
         env:
           GITHUB_REPOSITORY_NAME: ${{ inputs.GITHUB_REPOSITORY_NAME }}
           GITHUB_ORGANIZATION: ${{ inputs.GITHUB_ORGANIZATION }}
-        secrets: inherit
+
 
       - uses: Pesquisa-e-Inovacao-Grupo-8/TEMPLATES-PIPELINES/.github/workflows/deploy-on-ec2.yml@main
         name: Deploy to EC2 - PUBLIC
         env:
           GITHUB_REPOSITORY_NAME: ${{ inputs.GITHUB_REPOSITORY_NAME }}
           GITHUB_ORGANIZATION: ${{ inputs.GITHUB_ORGANIZATION }}
-        secrets:
           EC2_DNS: ${{ secrets.EC2_PRIVATE_DNS }}
           DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
 
@@ -57,7 +56,6 @@ jobs:
         env:
           GITHUB_REPOSITORY_NAME: ${{ inputs.GITHUB_REPOSITORY_NAME }}
           GITHUB_ORGANIZATION: ${{ inputs.GITHUB_ORGANIZATION }}
-        secrets: inherit
 
 
       - uses: Pesquisa-e-Inovacao-Grupo-8/TEMPLATES-PIPELINES/.github/workflows/docker-build.yml@main
