@@ -11,7 +11,7 @@ on:
         description: "GitHub Organization Name"
         required: true
         type: string
-
+        
     secrets:
       SONAR_TOKEN:
         required: true
@@ -27,6 +27,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # SonarCloud needs full history for accurate blame/analysis
 
       - name: Setup Python
         uses: actions/setup-python@v4
@@ -37,23 +39,29 @@ jobs:
       - name: Verify Python
         run: python --version
 
-      - name: SonarCloud
+      - name: Install dependencies
+        run: |
+          if [ -f requirements.txt ]; then
+            pip install -r requirements.txt
+          fi
+
+      - name: Set Sonar variables
+        id: sonar_vars
         env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           GITHUB_ORGANIZATION: ${{ inputs.GITHUB_ORGANIZATION }}
           GITHUB_REPOSITORY_NAME: ${{ inputs.GITHUB_REPOSITORY_NAME }}
         run: |
-          GITHUB_ORGANIZATION=$(echo "$GITHUB_ORGANIZATION" | tr '[:upper:]' '[:lower:]')
+          ORG_LOWER=$(echo "$GITHUB_ORGANIZATION" | tr '[:upper:]' '[:lower:]')
+          echo "org_lower=$ORG_LOWER" >> "$GITHUB_OUTPUT"
+          echo "project_key=${ORG_LOWER}_${GITHUB_REPOSITORY_NAME}" >> "$GITHUB_OUTPUT"
 
-          echo "GITHUB_REPOSITORY: $GITHUB_REPOSITORY_NAME"
-          echo "GITHUB_ORGANIZATION: $GITHUB_ORGANIZATION"
-          echo "SONAR_PROJECT_KEY: ${GITHUB_ORGANIZATION}_${GITHUB_REPOSITORY_NAME}"
-
-          ./mvnw clean verify sonar:sonar \
-            -Dsonar.projectKey="${GITHUB_ORGANIZATION}_${GITHUB_REPOSITORY_NAME}" \
-            -Dsonar.organization="$GITHUB_ORGANIZATION" \
-            -Dsonar.token="$SONAR_TOKEN"
-
-
-
-
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarqube-scan-action@v4
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        with:
+          args: >
+            -Dsonar.projectKey=${{ steps.sonar_vars.outputs.project_key }}
+            -Dsonar.organization=${{ steps.sonar_vars.outputs.org_lower }}
+            -Dsonar.sources=.
+            -Dsonar.python.version=3.13
