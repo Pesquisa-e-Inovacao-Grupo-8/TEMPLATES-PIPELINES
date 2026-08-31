@@ -24,7 +24,6 @@ jobs:
   deploy-ec2-private:
     name: Deploy to EC2
     runs-on: vm-ec2-runner-aws
-    environment: PRD
 
     steps:
       - name: Deploy Application
