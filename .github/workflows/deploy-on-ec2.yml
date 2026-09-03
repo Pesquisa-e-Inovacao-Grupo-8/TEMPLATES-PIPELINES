@@ -1,4 +1,4 @@
-name: Deploy to EC2
+name: DEPLOY ON EC2 - QA E PRD
 
 on:
   workflow_call:
@@ -23,7 +23,7 @@ on:
         required: true
       
 jobs:
-  deploy-ec2-dev:
+  deploy-ec2-qa:
     name: Deploy to EC2 - QA
 
     runs-on: vm-ec2-runner-aws
@@ -95,12 +95,12 @@ jobs:
           EOF
 
 
-  rollback-ec2-dev:
+  rollback-ec2-qa:
 
     name: Rollback EC2 - QA
 
     needs:
-      - deploy-ec2-dev
+      - deploy-ec2-qa
 
     if: ${{ failure() }}
 
@@ -116,7 +116,7 @@ jobs:
           echo "Iniciando rollback..."
 
           echo "Imagem anterior:"
-          echo "${{ needs.deploy-ec2-dev.outputs.previous_image }}"
+          echo "${{ needs.deploy-ec2-qa.outputs.previous_image }}"
 
           ssh \
             -i "/home/ubuntu/.ssh/vm-key-pair.pem" \
@@ -127,7 +127,7 @@ jobs:
 
           cd "$PROJECT_DIR"
 
-          PREVIOUS_IMAGE="${{ needs.deploy-ec2-dev.outputs.previous_image }}"
+          PREVIOUS_IMAGE="${{ needs.deploy-ec2-qa.outputs.previous_image }}"
 
           echo "Restaurando imagem: $PREVIOUS_IMAGE"
 
@@ -147,7 +147,7 @@ jobs:
   deploy-ec2-prd:
     name: Deploy to EC2 - PRD
 
-    needs: deploy-ec2-dev
+    needs: deploy-ec2-qa
 
     runs-on: vm-ec2-runner-aws
     if: ${{ github.ref == 'refs/heads/main' }}

@@ -1,5 +1,4 @@
-name: Build and Push - Docker Hub
-
+name: BUILD E PUSH - DOCKER HUB
 on:
   workflow_call:
     inputs:

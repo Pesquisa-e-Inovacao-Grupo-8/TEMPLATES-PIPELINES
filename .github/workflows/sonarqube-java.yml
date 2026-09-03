@@ -1,4 +1,4 @@
-name: SonarCloud analysis
+name: ANALISE SONAR - JAVA
 
 on:
   workflow_call:
