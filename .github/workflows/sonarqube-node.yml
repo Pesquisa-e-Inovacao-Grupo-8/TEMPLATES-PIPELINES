@@ -42,18 +42,11 @@ jobs:
         run: npm ci
 
       - name: SonarCloud
+        uses: SonarSource/sonarcloud-github-action@v5
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          GITHUB_ORGANIZATION: ${{ inputs.GITHUB_ORGANIZATION }}
-          GITHUB_REPOSITORY_NAME: ${{ inputs.GITHUB_REPOSITORY_NAME }}
-        run: |
-          GITHUB_ORGANIZATION=$(echo "$GITHUB_ORGANIZATION" | tr '[:upper:]' '[:lower:]')
-
-          echo "GITHUB_REPOSITORY: $GITHUB_REPOSITORY_NAME"
-          echo "GITHUB_ORGANIZATION: $GITHUB_ORGANIZATION"
-          echo "SONAR_PROJECT_KEY: ${GITHUB_ORGANIZATION}_${GITHUB_REPOSITORY_NAME}"
-
-          npx sonar-scanner \
-            -Dsonar.projectKey="${GITHUB_ORGANIZATION}_${GITHUB_REPOSITORY_NAME}" \
-            -Dsonar.organization="$GITHUB_ORGANIZATION" \
-            -Dsonar.token="$SONAR_TOKEN"
+        with:
+          args: >
+            -Dsonar.projectKey=${{ inputs.GITHUB_ORGANIZATION }}_${{ inputs.GITHUB_REPOSITORY_NAME }}
+            -Dsonar.organization=${{ inputs.GITHUB_ORGANIZATION }}
+            -Dsonar.host.url=https://sonarcloud.io
