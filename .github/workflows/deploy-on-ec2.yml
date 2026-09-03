@@ -135,8 +135,6 @@ jobs:
     needs:
       - deploy-ec2-prd
     environment: ROLLBACK
-      name: production
-      url: ${{ secrets.EC2_DNS }}
     runs-on: vm-ec2-runner-aws
     steps:
 
