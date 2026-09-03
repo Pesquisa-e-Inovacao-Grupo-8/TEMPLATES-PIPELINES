@@ -132,8 +132,8 @@ jobs:
 
   rollback-ec2-prd:
     name: Rollback EC2 - PRD
-    needs:
-      - deploy-ec2-prd
+    # needs:
+    #   - deploy-ec2-prd
     environment: ROLLBACK
     runs-on: vm-ec2-runner-aws
     steps:
