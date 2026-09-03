@@ -47,6 +47,6 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         with:
           args: >
-            -Dsonar.projectKey=${{ inputs.GITHUB_ORGANIZATION }}_${{ inputs.GITHUB_REPOSITORY_NAME }}
-            -Dsonar.organization=${{ inputs.GITHUB_ORGANIZATION }}
+            -Dsonar.projectKey=$(echo "$GITHUB_ORGANIZATION" | tr '[:upper:]' '[:lower:]')_${{ inputs.GITHUB_REPOSITORY_NAME }}
+            -Dsonar.organization=$(echo "$GITHUB_ORGANIZATION" | tr '[:upper:]' '[:lower:]')
             -Dsonar.host.url=https://sonarcloud.io
