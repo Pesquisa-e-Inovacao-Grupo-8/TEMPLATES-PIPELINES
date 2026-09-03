@@ -38,22 +38,22 @@ jobs:
       - name: Verify Node.js
         run: node --version
 
-      - name: SonarCloud Scan
-        uses: SonarSource/sonarcloud-github-action@master
-        with:
-          projectBaseDir: FRONT-END-REACT
+      - name: Install dependencies
+        run: npm ci
+
+      - name: SonarCloud
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           GITHUB_ORGANIZATION: ${{ inputs.GITHUB_ORGANIZATION }}
           GITHUB_REPOSITORY_NAME: ${{ inputs.GITHUB_REPOSITORY_NAME }}
-          SONAR_PROJECT_KEY: ${{ inputs.GITHUB_ORGANIZATION }}_${{ inputs.GITHUB_REPOSITORY_NAME }}
-
-      - name: Debug Sonar metadata
         run: |
+          GITHUB_ORGANIZATION=$(echo "$GITHUB_ORGANIZATION" | tr '[:upper:]' '[:lower:]')
+
           echo "GITHUB_REPOSITORY: $GITHUB_REPOSITORY_NAME"
-          echo "GITHUB_ORGANIZATION: $(echo '${{ inputs.GITHUB_ORGANIZATION }}' | tr '[:upper:]' '[:lower:]')"
-          echo "SONAR_PROJECT_KEY: ${{ inputs.GITHUB_ORGANIZATION }}_${{ inputs.GITHUB_REPOSITORY_NAME }}"
+          echo "GITHUB_ORGANIZATION: $GITHUB_ORGANIZATION"
+          echo "SONAR_PROJECT_KEY: ${GITHUB_ORGANIZATION}_${GITHUB_REPOSITORY_NAME}"
 
-
-
-
+          npx sonar-scanner \
+            -Dsonar.projectKey="${GITHUB_ORGANIZATION}_${GITHUB_REPOSITORY_NAME}" \
+            -Dsonar.organization="$GITHUB_ORGANIZATION" \
+            -Dsonar.token="$SONAR_TOKEN"
