@@ -67,7 +67,6 @@ jobs:
   #   name: Deploy to EC2 - PRD
   #   needs: deploy-ec2-qa
   #   runs-on: vm-ec2-runner-aws
-  #   if: ${{ github.ref == 'refs/heads/main' }}
   #   environment: PRD
   #   outputs:
   #     previous_image: ${{ steps.get-previous-image.outputs.previous_image }}
