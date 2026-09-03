@@ -7,6 +7,7 @@ on:
         description: "GitHub Repository Name"
         required: true
         type: string
+
       GITHUB_ORGANIZATION:
         description: "GitHub Organization Name"
         required: true
@@ -49,7 +50,7 @@ jobs:
           echo "GITHUB_ORGANIZATION: $GITHUB_ORGANIZATION"
           echo "SONAR_PROJECT_KEY: ${GITHUB_ORGANIZATION}_${GITHUB_REPOSITORY_NAME}"
 
-          ./mvnw clean verify sonar:sonar \
+          ./node_modules/.bin/sonar-scanner \
             -Dsonar.projectKey="${GITHUB_ORGANIZATION}_${GITHUB_REPOSITORY_NAME}" \
             -Dsonar.organization="$GITHUB_ORGANIZATION" \
             -Dsonar.token="$SONAR_TOKEN"

@@ -12,10 +12,12 @@ on:
         description: "GitHub Organization Name"
         required: true
         type: string
+
     secrets:
       EC2_DNS:
         description: "EC2 DNS"
         required: true
+
       DOCKERHUB_USERNAME:
         description: "Docker Hub Username"
         required: true
@@ -23,9 +25,40 @@ on:
 jobs:
   deploy-ec2-dev:
     name: Deploy to EC2 - QA
+
     runs-on: vm-ec2-runner-aws
+
+    outputs:
+      previous_image: ${{ steps.get-previous-image.outputs.previous_image }}
     
     steps:
+
+      - name: Get Current Image
+        id: get-previous-image
+        shell: bash
+
+        run: |
+
+          PREVIOUS_IMAGE=$(ssh \
+            -i "/home/ubuntu/.ssh/vm-key-pair.pem" \
+            -o StrictHostKeyChecking=no \
+            ubuntu@${{ secrets.EC2_DNS }} << 'EOF'
+
+          PROJECT_DIR="/home/ubuntu/${{ inputs.GITHUB_REPOSITORY_NAME }}"
+
+          cd "$PROJECT_DIR"
+
+          sudo docker compose config --images | head -n 1
+
+          EOF
+          )
+
+          PREVIOUS_IMAGE=$(echo "$PREVIOUS_IMAGE" | tail -n 1 | tr -d '\r')
+
+          echo "Imagem atual: $PREVIOUS_IMAGE"
+
+          echo "previous_image=$PREVIOUS_IMAGE" >> "$GITHUB_OUTPUT"
+
       - name: Deploy Application
         shell: bash
         run: |
@@ -61,14 +94,94 @@ jobs:
 
           EOF
 
-  deploy-ec2-prd:
-    name: Deploy to EC2 - PRD
-    needs: deploy-ec2-dev
+
+  rollback-ec2-dev:
+
+    name: Rollback EC2 - QA
+
+    needs:
+      - deploy-ec2-dev
+
+    if: ${{ failure() }}
+
     runs-on: vm-ec2-runner-aws
-    if: ${{ github.ref == 'refs/heads/main' }}
-    environment: PRD
 
     steps:
+
+      - name: Rollback Application
+        shell: bash
+
+        run: |
+
+          echo "Iniciando rollback..."
+
+          echo "Imagem anterior:"
+          echo "${{ needs.deploy-ec2-dev.outputs.previous_image }}"
+
+          ssh \
+            -i "/home/ubuntu/.ssh/vm-key-pair.pem" \
+            -o StrictHostKeyChecking=no \
+            ubuntu@${{ secrets.EC2_DNS }} << 'EOF'
+
+          PROJECT_DIR="/home/ubuntu/${{ inputs.GITHUB_REPOSITORY_NAME }}"
+
+          cd "$PROJECT_DIR"
+
+          PREVIOUS_IMAGE="${{ needs.deploy-ec2-dev.outputs.previous_image }}"
+
+          echo "Restaurando imagem: $PREVIOUS_IMAGE"
+
+          sudo docker pull "$PREVIOUS_IMAGE"
+
+          sed -i "s|image:.*|image: $PREVIOUS_IMAGE|g" docker-compose.yml
+
+          sudo docker compose down
+
+          sudo docker compose up -d
+
+          echo "Rollback concluído."
+
+          EOF
+
+
+  deploy-ec2-prd:
+    name: Deploy to EC2 - PRD
+
+    needs: deploy-ec2-dev
+
+    runs-on: vm-ec2-runner-aws
+    if: ${{ github.ref == 'refs/heads/main' }}
+  
+    outputs:
+      previous_image: ${{ steps.get-previous-image.outputs.previous_image }}
+
+    steps:
+      - name: Get Current Image
+        id: get-previous-image
+        shell: bash
+
+        run: |
+
+          PREVIOUS_IMAGE=$(ssh \
+            -i "/home/ubuntu/.ssh/vm-key-pair.pem" \
+            -o StrictHostKeyChecking=no \
+            ubuntu@${{ secrets.EC2_DNS }} << 'EOF'
+
+          PROJECT_DIR="/home/ubuntu/${{ inputs.GITHUB_REPOSITORY_NAME }}"
+
+          cd "$PROJECT_DIR"
+
+          sudo docker compose config --images | head -n 1
+
+          EOF
+          )
+
+          PREVIOUS_IMAGE=$(echo "$PREVIOUS_IMAGE" | tail -n 1 | tr -d '\r')
+
+          echo "Imagem atual: $PREVIOUS_IMAGE"
+
+          echo "previous_image=$PREVIOUS_IMAGE" >> "$GITHUB_OUTPUT"
+
       - name: Deploy Application
         shell: bash
         run: |
@@ -104,4 +217,54 @@ jobs:
 
           EOF
 
-# CRIAR LOGICA DE ROLLBACK AQUI \/\/\/\/\/
+
+  rollback-ec2-prd:
+
+    name: Rollback EC2 - PRD
+
+    needs:
+      - deploy-ec2-prd
+
+    if: ${{ always() && needs.deploy-ec2-prd.result == 'failure' }}
+
+    runs-on: vm-ec2-runner-aws
+
+    steps:
+
+      - name: Rollback Application
+        shell: bash
+
+        run: |
+
+          echo "Iniciando rollback..."
+
+          PREVIOUS_IMAGE="${{ needs.deploy-ec2-prd.outputs.previous_image }}"
+
+          echo "Imagem anterior:"
+          echo "$PREVIOUS_IMAGE"
+
+          ssh \
+            -i "/home/ubuntu/.ssh/vm-key-pair.pem" \
+            -o StrictHostKeyChecking=no \
+            ubuntu@${{ secrets.EC2_DNS_PRD }} << 'EOF'
+
+          PROJECT_DIR="/home/ubuntu/${{ inputs.GITHUB_REPOSITORY_NAME }}"
+
+          cd "$PROJECT_DIR"
+
+          PREVIOUS_IMAGE="${{ needs.deploy-ec2-prd.outputs.previous_image }}"
+
+          echo "Restaurando: $PREVIOUS_IMAGE"
+
+          sudo docker pull "$PREVIOUS_IMAGE"
+
+          sed -i "s|image:.*|image: $PREVIOUS_IMAGE|g" docker-compose.yml
+
+          sudo docker compose down
+
+          sudo docker compose up -d
+
+          echo "Rollback PRD concluído."
+
+          EOF
+

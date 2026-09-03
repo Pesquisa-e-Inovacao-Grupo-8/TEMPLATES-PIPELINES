@@ -14,7 +14,6 @@ on:
         type: string
 
 jobs:
-
   sonarqube:
     name: SonarCloud Analysis
     uses: Pesquisa-e-Inovacao-Grupo-8/TEMPLATES-PIPELINES/.github/workflows/sonarqube-node.yml@main
@@ -25,6 +24,7 @@ jobs:
 
   docker:
     name: Docker Build
+    needs: sonarqube
     uses: Pesquisa-e-Inovacao-Grupo-8/TEMPLATES-PIPELINES/.github/workflows/docker-build.yml@main
     with:
       GITHUB_REPOSITORY_NAME: ${{ inputs.GITHUB_REPOSITORY_NAME }}
