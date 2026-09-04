@@ -40,5 +40,6 @@ jobs:
       GITHUB_REPOSITORY_NAME: ${{ inputs.GITHUB_REPOSITORY_NAME }}
       GITHUB_ORGANIZATION: ${{ inputs.GITHUB_ORGANIZATION }}
     secrets:
-      EC2_DNS: ${{ secrets.EC2_PRIVATE_DNS }}
+      EC2_DNS_QA: ${{ secrets.EC2_PRIVATE_DNS_QA }}
+      EC2_DNS_PRD: ${{ secrets.EC2_PRIVATE_DNS_PRD }}
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}

@@ -14,8 +14,12 @@ on:
         type: string
 
     secrets:
-      EC2_DNS:
-        description: "EC2 DNS"
+      EC2_DNS_QA:
+        description: "EC2 DNS QA"
+        required: true
+
+      EC2_DNS_PRD:
+        description: "EC2 DNS PRD"
         required: true
 
       DOCKERHUB_USERNAME:
@@ -25,7 +29,7 @@ on:
 jobs:
   deploy-ec2-qa:
     name: Deploy to EC2 - QA
-    runs-on: vm-ec2-runner-aws
+    runs-on: vm-ec2-aws-qa
     steps:
 
       - name: Deploy Application
@@ -34,7 +38,7 @@ jobs:
           ssh \
             -i "/home/ubuntu/.ssh/vm-key-pair.pem" \
             -o StrictHostKeyChecking=no \
-            ubuntu@${{ secrets.EC2_DNS }} << 'EOF'
+            ubuntu@${{ secrets.EC2_DNS_QA }} << 'EOF'
 
           sudo apt update
           sudo apt install -y docker.io docker-compose
@@ -63,70 +67,70 @@ jobs:
 
           EOF
 
-  # deploy-ec2-prd:
-  #   name: Deploy to EC2 - PRD
-  #   needs: deploy-ec2-qa
-  #   runs-on: vm-ec2-runner-aws
-  #   environment: PRD
-  #   outputs:
-  #     previous_image: ${{ steps.get-previous-image.outputs.previous_image }}
+  deploy-ec2-prd:
+    name: Deploy to EC2 - PRD
+    needs: deploy-ec2-qa
+    runs-on: vm-ec2-runner-aws
+    environment: PRD
+    outputs:
+      previous_image: ${{ steps.get-previous-image.outputs.previous_image }}
 
-  #   steps:
-  #     - name: Get Current Image
-  #       id: get-previous-image
-  #       shell: bash
-  #       run: |
+    steps:
+      - name: Get Current Image
+        id: get-previous-image
+        shell: bash
+        run: |
 
-  #         PREVIOUS_IMAGE=$(ssh \
-  #           -i "/home/ubuntu/.ssh/vm-key-pair.pem" \
-  #           -o StrictHostKeyChecking=no \
-  #           ubuntu@${{ secrets.EC2_DNS }} << 'EOF'
+          PREVIOUS_IMAGE=$(ssh \
+            -i "/home/ubuntu/.ssh/vm-key-pair.pem" \
+            -o StrictHostKeyChecking=no \
+            ubuntu@${{ secrets.EC2_DNS_PRD }} << 'EOF'
 
-  #         PROJECT_DIR="/home/ubuntu/${{ inputs.GITHUB_REPOSITORY_NAME }}"
+          PROJECT_DIR="/home/ubuntu/${{ inputs.GITHUB_REPOSITORY_NAME }}"
 
-  #         cd "$PROJECT_DIR"
-  #         sudo docker compose config --images | head -n 1
-  #         EOF
-  #         )
+          cd "$PROJECT_DIR"
+          sudo docker compose config --images | head -n 1
+          EOF
+          )
 
-  #         PREVIOUS_IMAGE=$(echo "$PREVIOUS_IMAGE" | tail -n 1 | tr -d '\r')
-  #         echo "Imagem atual: $PREVIOUS_IMAGE"
-  #         echo "previous_image=$PREVIOUS_IMAGE" >> "$GITHUB_OUTPUT"
+          PREVIOUS_IMAGE=$(echo "$PREVIOUS_IMAGE" | tail -n 1 | tr -d '\r')
+          echo "Imagem atual: $PREVIOUS_IMAGE"
+          echo "previous_image=$PREVIOUS_IMAGE" >> "$GITHUB_OUTPUT"
 
-  #     - name: Deploy Application
-  #       shell: bash
-  #       run: |
-  #         ssh \
-  #           -i "/home/ubuntu/.ssh/vm-key-pair.pem" \
-  #           -o StrictHostKeyChecking=no \
-  #           ubuntu@${{ secrets.EC2_DNS_PRD }} << 'EOF'
+      - name: Deploy Application
+        shell: bash
+        run: |
+          ssh \
+            -i "/home/ubuntu/.ssh/vm-key-pair.pem" \
+            -o StrictHostKeyChecking=no \
+            ubuntu@${{ secrets.EC2_DNS_PRD }} << 'EOF'
 
-  #         sudo apt update
-  #         sudo apt install -y docker.io docker-compose
+          sudo apt update
+          sudo apt install -y docker.io docker-compose
 
-  #         PROJECT_DIR="/home/ubuntu/${{ inputs.GITHUB_REPOSITORY_NAME }}"
+          PROJECT_DIR="/home/ubuntu/${{ inputs.GITHUB_REPOSITORY_NAME }}"
 
-  #         if [ -d "$PROJECT_DIR" ]; then
-  #           echo "Diretório já existe: $PROJECT_DIR"
-  #         else
-  #           echo "Diretório não existe. Criando..."
-  #           mkdir -p "$PROJECT_DIR"
-  #         fi
+          if [ -d "$PROJECT_DIR" ]; then
+            echo "Diretório já existe: $PROJECT_DIR"
+          else
+            echo "Diretório não existe. Criando..."
+            mkdir -p "$PROJECT_DIR"
+          fi
 
-  #         cd "$PROJECT_DIR"
+          cd "$PROJECT_DIR"
 
-  #         USERNAME=$(echo -n "${{ secrets.DOCKERHUB_USERNAME }}" | tr -d '\r\n')
-  #         REPOSITORY=$(echo -n "${{ inputs.GITHUB_REPOSITORY_NAME }}" | tr -d '\r\n' | tr '[:upper:]' '[:lower:]')
-  #         IMAGE="$USERNAME/$REPOSITORY:${{ github.run_number }}"
+          USERNAME=$(echo -n "${{ secrets.DOCKERHUB_USERNAME }}" | tr -d '\r\n')
+          REPOSITORY=$(echo -n "${{ inputs.GITHUB_REPOSITORY_NAME }}" | tr -d '\r\n' | tr '[:upper:]' '[:lower:]')
+          IMAGE="$USERNAME/$REPOSITORY:${{ github.run_number }}"
 
-  #         docker pull "$IMAGE"
+          docker pull "$IMAGE"
 
-  #         sed -i "s|image:.*|image: $IMAGE|g" docker-compose.yml
+          sed -i "s|image:.*|image: $IMAGE|g" docker-compose.yml
 
-  #         sudo docker compose down
-  #         sudo docker compose up -d
+          sudo docker compose down
+          sudo docker compose up -d
 
-  #         EOF
+          EOF
 
 
   rollback-ec2-prd:
