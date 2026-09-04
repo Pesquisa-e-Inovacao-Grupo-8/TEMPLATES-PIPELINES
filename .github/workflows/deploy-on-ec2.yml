@@ -36,7 +36,7 @@ jobs:
         shell: bash
         run: |
           ssh \
-            -i "/home/ubuntu/.ssh/vm-key-pair.pem" \
+            -i "/home/ubuntu/.ssh/vm-key-pair-dev.pem" \
             -o StrictHostKeyChecking=no \
             ubuntu@${{ secrets.EC2_DNS_QA }} << 'EOF'
 
@@ -135,8 +135,7 @@ jobs:
 
   rollback-ec2-prd:
     name: Rollback EC2 - PRD
-    # needs:
-    #   - deploy-ec2-prd
+    needs: deploy-ec2-prd
     runs-on: vm-ec2-runner-aws
     environment: ROLLBACK
     steps:
