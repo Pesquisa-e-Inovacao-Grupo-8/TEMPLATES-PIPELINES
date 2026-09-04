@@ -70,6 +70,7 @@ jobs:
   deploy-ec2-prd:
     name: Deploy to EC2 - PRD
     needs: deploy-ec2-qa
+    if: github.ref != 'refs/heads/main'
     runs-on: vm-ec2-runner-aws
     environment: PRD
     outputs:
