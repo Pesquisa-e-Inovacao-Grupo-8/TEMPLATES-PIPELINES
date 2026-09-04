@@ -155,7 +155,7 @@ jobs:
           ssh \
             -i "/home/ubuntu/.ssh/vm-key-pair.pem" \
             -o StrictHostKeyChecking=no \
-            ubuntu@${{ secrets.EC2_DNS }} << 'EOF'
+            ubuntu@${{ secrets.EC2_DNS_PRD }} << 'EOF'
 
           PROJECT_DIR="/home/ubuntu/${{ inputs.GITHUB_REPOSITORY_NAME }}"
 
