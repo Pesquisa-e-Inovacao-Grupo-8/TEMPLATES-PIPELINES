@@ -1,4 +1,4 @@
-name: Create Ansible
+name: CRIAR ANSIBLE
 
 on:
   workflow_call:

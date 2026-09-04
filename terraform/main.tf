@@ -58,10 +58,6 @@ resource "aws_security_group" "ec2_sg" {
 
 }
 
-##########################################
-#         EC2 - ACCOUNT 1                # 
-##########################################
-
 resource "aws_instance" "account1" {
   provider = aws.account1
   ami = data.aws_ami.ubuntu.id

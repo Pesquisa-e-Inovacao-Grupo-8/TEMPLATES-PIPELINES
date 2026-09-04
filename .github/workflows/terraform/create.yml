@@ -1,4 +1,4 @@
-name: Create Infrastructure
+name: CRIAR INFRAESTRUTURA
 
 on:
   workflow_dispatch:
@@ -21,13 +21,3 @@ jobs:
 
     secrets: inherit
 
-
-  # docker-compose:
-  #   name: Copiar Docker Compose
-  #   needs: ansible
-  #   uses: ./.github/workflows/reusable/docker.yml
-
-  #   with:
-  #     ec2_public_ip: ${{ needs.terraform.outputs.ec2_public_ip }}
-
-  #   secrets: inherit
