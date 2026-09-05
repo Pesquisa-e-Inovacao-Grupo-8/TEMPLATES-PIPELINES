@@ -41,9 +41,6 @@ jobs:
             -o StrictHostKeyChecking=no \
             ubuntu@${{ secrets.EC2_DNS_QA }} << 'EOF'
 
-          sudo apt update
-          sudo apt install -y docker.io docker-compose
-
           PROJECT_DIR="/home/ubuntu/${{ inputs.GITHUB_REPOSITORY_NAME }}"
 
           if [ -d "$PROJECT_DIR" ]; then
@@ -104,9 +101,6 @@ jobs:
             -i "/home/ubuntu/.ssh/vm-key-pair.pem" \
             -o StrictHostKeyChecking=no \
             ubuntu@${{ secrets.EC2_DNS_PRD }} << 'EOF'
-
-          sudo apt update
-          sudo apt install -y docker.io docker-compose
 
           PROJECT_DIR="/home/ubuntu/${{ inputs.GITHUB_REPOSITORY_NAME }}"
 
