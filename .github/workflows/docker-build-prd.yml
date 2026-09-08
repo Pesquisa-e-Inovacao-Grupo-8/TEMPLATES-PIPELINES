@@ -21,6 +21,7 @@ on:
 jobs:
   docker:
     name: Build & Push - DOCKER PRD
+    environment: PRD
     runs-on: ubuntu-latest
 
     env:

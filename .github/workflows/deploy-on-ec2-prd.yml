@@ -28,8 +28,6 @@ jobs:
     name: Deploy to EC2 - PRD
     runs-on: vm-ec2-aws-prd
     environment: PRD
-    outputs:
-      previous_image: ${{ steps.get-previous-image.outputs.previous_image }}
 
     steps:
       - name: Deploy Application
@@ -68,6 +66,7 @@ jobs:
   rollback-ec2-prd:
     name: Rollback EC2 - PRD
     needs: deploy-ec2-prd
+    if: ${{ always() && needs.deploy-ec2-prd.result == 'failure' }}
     runs-on: vm-ec2-aws-prd
     environment: ROLLBACK
     steps:
@@ -79,10 +78,12 @@ jobs:
 
           echo "Iniciando rollback..."
 
-          PREVIOUS_IMAGE="${{ needs.deploy-ec2-prd.outputs.previous_image }}"
 
-          echo "Imagem anterior:"
-          echo "$PREVIOUS_IMAGE"
+          USERNAME=$(echo -n "${{ secrets.DOCKERHUB_USERNAME }}" | tr -d '\r\n')
+          REPOSITORY=$(echo -n "${{ inputs.GITHUB_REPOSITORY_NAME }}" | tr -d '\r\n' | tr '[:upper:]' '[:lower:]')
+          PREVIOUS_RUN=$(( ${{ github.run_number }} - 1 ))
+          PREVIOUS_IMAGE="$USERNAME/$REPOSITORY-prd:$PREVIOUS_RUN"
+          echo "Imagem anterior: $PREVIOUS_IMAGE"
 
           ssh \
             -i "/home/ubuntu/.ssh/vm-key-pair.pem" \
@@ -93,9 +94,13 @@ jobs:
 
           cd "$PROJECT_DIR"
 
-          PREVIOUS_IMAGE="${{ needs.deploy-ec2-prd.outputs.previous_image }}"
-
+          USERNAME=$(echo -n "${{ secrets.DOCKERHUB_USERNAME }}" | tr -d '\r\n')
+          REPOSITORY=$(echo -n "${{ inputs.GITHUB_REPOSITORY_NAME }}" | tr -d '\r\n' | tr '[:upper:]' '[:lower:]')
+          PREVIOUS_RUN=$(( ${{ github.run_number }} - 1 ))
+          PREVIOUS_IMAGE="$USERNAME/$REPOSITORY-prd:$PREVIOUS_RUN"
           echo "Restaurando: $PREVIOUS_IMAGE"
+
+          docker pull "$PREVIOUS_IMAGE"
 
           sed -i "s|image:.*|image: $PREVIOUS_IMAGE|g" docker-compose.yml
           sudo docker compose down
