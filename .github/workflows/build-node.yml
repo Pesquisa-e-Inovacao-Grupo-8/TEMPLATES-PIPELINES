@@ -31,7 +31,7 @@ jobs:
       GITHUB_ORGANIZATION: ${{ inputs.GITHUB_ORGANIZATION }}
     secrets: inherit
 
-  deploy:
+  deploy-qa:
     name: Deploy to EC2 - QA
     needs: docker-qa
     uses: Pesquisa-e-Inovacao-Grupo-8/TEMPLATES-PIPELINES/.github/workflows/deploy-on-ec2-qa.yml@main
@@ -46,7 +46,7 @@ jobs:
 
   docker-prd:
     name: Docker Build - PRD
-    needs: sonarqube
+    needs: deploy-qa
     uses: Pesquisa-e-Inovacao-Grupo-8/TEMPLATES-PIPELINES/.github/workflows/docker-build-prd.yml@main
     with:
       GITHUB_REPOSITORY_NAME: ${{ inputs.GITHUB_REPOSITORY_NAME }}
