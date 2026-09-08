@@ -66,7 +66,6 @@ jobs:
   rollback-ec2-prd:
     name: Rollback EC2 - PRD
     needs: deploy-ec2-prd
-    if: ${{ always() && needs.deploy-ec2-prd.result == 'failure' }}
     runs-on: vm-ec2-aws-prd
     environment: ROLLBACK
     steps:
