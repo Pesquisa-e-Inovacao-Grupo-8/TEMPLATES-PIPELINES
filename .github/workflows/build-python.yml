@@ -55,7 +55,6 @@ jobs:
 
   deploy-prd:
     name: Deploy to EC2 - PRD
-    if: github.ref == 'refs/heads/main' 
     needs: docker-prd
     uses: Pesquisa-e-Inovacao-Grupo-8/TEMPLATES-PIPELINES/.github/workflows/deploy-on-ec2-prd.yml@main
     with:
