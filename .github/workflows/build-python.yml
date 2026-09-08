@@ -13,8 +13,6 @@ on:
         required: true
         type: string
 
-# ALTERAR SECRETS DNS PARA EC2_PUBLIC_DNS_PRD E EC2_PRIVATE_DNS_PRD | EC2_PUBLIC_DNS_DEV E EC2_PRIVATE_DNS_DEV
-
 jobs:
   sonarqube:
     name: SonarCloud Analysis
@@ -24,19 +22,40 @@ jobs:
       GITHUB_ORGANIZATION: ${{ inputs.GITHUB_ORGANIZATION }}
     secrets: inherit
 
-  docker:
-    name: Docker Build
+  docker-qa:
+    name: Docker Build - QA
     needs: sonarqube
-    uses: Pesquisa-e-Inovacao-Grupo-8/TEMPLATES-PIPELINES/.github/workflows/docker-build.yml@main
+    uses: Pesquisa-e-Inovacao-Grupo-8/TEMPLATES-PIPELINES/.github/workflows/docker-build-qa.yml@main
     with:
       GITHUB_REPOSITORY_NAME: ${{ inputs.GITHUB_REPOSITORY_NAME }}
       GITHUB_ORGANIZATION: ${{ inputs.GITHUB_ORGANIZATION }}
     secrets: inherit
 
-  deploy:
-    name: Deploy to EC2 - PUBLIC
-    needs: docker
-    uses: Pesquisa-e-Inovacao-Grupo-8/TEMPLATES-PIPELINES/.github/workflows/deploy-on-ec2.yml@main
+  deploy-qa:
+    name: Deploy to EC2 - QA
+    needs: docker-qa
+    uses: Pesquisa-e-Inovacao-Grupo-8/TEMPLATES-PIPELINES/.github/workflows/deploy-on-ec2-qa.yml@main
+    with:
+      GITHUB_REPOSITORY_NAME: ${{ inputs.GITHUB_REPOSITORY_NAME }}
+      GITHUB_ORGANIZATION: ${{ inputs.GITHUB_ORGANIZATION }}
+    secrets:
+      EC2_DNS_QA: ${{ secrets.EC2_PRIVATE_DNS_QA }}
+      EC2_DNS_PRD: ${{ secrets.EC2_PRIVATE_DNS_PRD }}
+      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+
+  docker-prd:
+    name: Docker Build - PRD
+    needs: sonarqube
+    uses: Pesquisa-e-Inovacao-Grupo-8/TEMPLATES-PIPELINES/.github/workflows/docker-build-prd.yml@main
+    with:
+      GITHUB_REPOSITORY_NAME: ${{ inputs.GITHUB_REPOSITORY_NAME }}
+      GITHUB_ORGANIZATION: ${{ inputs.GITHUB_ORGANIZATION }}
+    secrets: inherit
+
+  deploy-prd:
+    name: Deploy to EC2 - PRD
+    needs: docker-prd
+    uses: Pesquisa-e-Inovacao-Grupo-8/TEMPLATES-PIPELINES/.github/workflows/deploy-on-ec2-prd.yml@main
     with:
       GITHUB_REPOSITORY_NAME: ${{ inputs.GITHUB_REPOSITORY_NAME }}
       GITHUB_ORGANIZATION: ${{ inputs.GITHUB_ORGANIZATION }}

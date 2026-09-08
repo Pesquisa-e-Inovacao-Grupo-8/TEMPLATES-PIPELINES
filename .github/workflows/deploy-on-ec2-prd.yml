@@ -1,0 +1,131 @@
+name: DEPLOY ON EC2 - QA E PRD
+
+on:
+  workflow_call:
+    inputs:
+      GITHUB_REPOSITORY_NAME:
+        description: "GitHub Repository Name"
+        required: true
+        type: string
+
+      GITHUB_ORGANIZATION:
+        description: "GitHub Organization Name"
+        required: true
+        type: string
+
+    secrets:
+      EC2_DNS_QA:
+        description: "EC2 DNS QA"
+        required: true
+
+      EC2_DNS_PRD:
+        description: "EC2 DNS PRD"
+        required: true
+
+      DOCKERHUB_USERNAME:
+        description: "Docker Hub Username"
+        required: true
+      
+
+  deploy-ec2-prd:
+    name: Deploy to EC2 - PRD
+    runs-on: vm-ec2-runner-aws
+    environment: PRD
+    outputs:
+      previous_image: ${{ steps.get-previous-image.outputs.previous_image }}
+
+    steps:
+      - name: Get Current Image
+        id: get-previous-image
+        shell: bash
+        run: |
+
+          PREVIOUS_IMAGE=$(ssh \
+            -i "/home/ubuntu/.ssh/vm-key-pair.pem" \
+            -o StrictHostKeyChecking=no \
+            ubuntu@${{ secrets.EC2_DNS_PRD }} << 'EOF'
+
+          PROJECT_DIR="/home/ubuntu/${{ inputs.GITHUB_REPOSITORY_NAME }}"
+
+          cd "$PROJECT_DIR"
+          sudo docker compose config --images | head -n 1
+          EOF
+          )
+
+          PREVIOUS_IMAGE=$(echo "$PREVIOUS_IMAGE" | tail -n 1 | tr -d '\r')
+          echo "Imagem atual: $PREVIOUS_IMAGE"
+          echo "previous_image=$PREVIOUS_IMAGE" >> "$GITHUB_OUTPUT"
+
+      - name: Deploy Application
+        shell: bash
+        run: |
+          ssh \
+            -i "/home/ubuntu/.ssh/vm-key-pair.pem" \
+            -o StrictHostKeyChecking=no \
+            ubuntu@${{ secrets.EC2_DNS_PRD }} << 'EOF'
+
+          PROJECT_DIR="/home/ubuntu/${{ inputs.GITHUB_REPOSITORY_NAME }}"
+
+          if [ -d "$PROJECT_DIR" ]; then
+            echo "Diretório já existe: $PROJECT_DIR"
+          else
+            echo "Diretório não existe. Criando..."
+            mkdir -p "$PROJECT_DIR"
+          fi
+
+          cd "$PROJECT_DIR"
+
+          USERNAME=$(echo -n "${{ secrets.DOCKERHUB_USERNAME }}" | tr -d '\r\n')
+          REPOSITORY=$(echo -n "${{ inputs.GITHUB_REPOSITORY_NAME }}" | tr -d '\r\n' | tr '[:upper:]' '[:lower:]')
+          IMAGE="$USERNAME/$REPOSITORY-prd:${{ github.run_number }}"
+
+          docker pull "$IMAGE"
+
+          sed -i "s|image:.*|image: $IMAGE|g" docker-compose.yml
+
+          sudo docker compose down
+          sudo docker compose up -d
+
+          EOF
+
+
+  rollback-ec2-prd:
+    name: Rollback EC2 - PRD
+    needs: deploy-ec2-prd
+    runs-on: vm-ec2-runner-aws
+    environment: ROLLBACK
+    steps:
+
+      - name: Rollback Application
+        shell: bash
+
+        run: |
+
+          echo "Iniciando rollback..."
+
+          PREVIOUS_IMAGE="${{ needs.deploy-ec2-prd.outputs.previous_image }}"
+
+          echo "Imagem anterior:"
+          echo "$PREVIOUS_IMAGE"
+
+          ssh \
+            -i "/home/ubuntu/.ssh/vm-key-pair.pem" \
+            -o StrictHostKeyChecking=no \
+            ubuntu@${{ secrets.EC2_DNS_PRD }} << 'EOF'
+
+          PROJECT_DIR="/home/ubuntu/${{ inputs.GITHUB_REPOSITORY_NAME }}"
+
+          cd "$PROJECT_DIR"
+
+          PREVIOUS_IMAGE="${{ needs.deploy-ec2-prd.outputs.previous_image }}"
+
+          echo "Restaurando: $PREVIOUS_IMAGE"
+
+          sed -i "s|image:.*|image: $PREVIOUS_IMAGE|g" docker-compose.yml
+          sudo docker compose down
+          sudo docker compose up -d
+
+          echo "Rollback PRD concluído."
+
+          EOF
+
