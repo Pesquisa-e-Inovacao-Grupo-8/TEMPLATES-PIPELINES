@@ -26,7 +26,6 @@ jobs:
     name: Docker Build - QA
     if: github.ref != 'refs/heads/main' 
     needs: sonarqube
-    if: startsWith(github.ref, 'refs/heads/release/')
     uses: Pesquisa-e-Inovacao-Grupo-8/TEMPLATES-PIPELINES/.github/workflows/docker-build-qa.yml@main
     with:
       GITHUB_REPOSITORY_NAME: ${{ inputs.GITHUB_REPOSITORY_NAME }}
@@ -37,7 +36,6 @@ jobs:
     name: Deploy to EC2 - QA
     if: github.ref != 'refs/heads/main' 
     needs: docker-qa
-    if: startsWith(github.ref, 'refs/heads/release/')
     uses: Pesquisa-e-Inovacao-Grupo-8/TEMPLATES-PIPELINES/.github/workflows/deploy-on-ec2-qa.yml@main
     with:
       GITHUB_REPOSITORY_NAME: ${{ inputs.GITHUB_REPOSITORY_NAME }}
