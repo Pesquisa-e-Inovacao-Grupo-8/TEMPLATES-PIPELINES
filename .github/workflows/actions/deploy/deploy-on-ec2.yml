@@ -54,7 +54,7 @@ jobs:
 
           USERNAME=$(echo -n "${{ secrets.DOCKERHUB_USERNAME }}" | tr -d '\r\n')
           REPOSITORY=$(echo -n "${{ inputs.GITHUB_REPOSITORY_NAME }}" | tr -d '\r\n' | tr '[:upper:]' '[:lower:]')
-          IMAGE="$USERNAME/$REPOSITORY:${{ github.run_number }}"
+          IMAGE="$USERNAME/$REPOSITORY-qa:${{ github.run_number }}"
 
           docker pull "$IMAGE"
 
@@ -115,7 +115,7 @@ jobs:
 
           USERNAME=$(echo -n "${{ secrets.DOCKERHUB_USERNAME }}" | tr -d '\r\n')
           REPOSITORY=$(echo -n "${{ inputs.GITHUB_REPOSITORY_NAME }}" | tr -d '\r\n' | tr '[:upper:]' '[:lower:]')
-          IMAGE="$USERNAME/$REPOSITORY:${{ github.run_number }}"
+          IMAGE="$USERNAME/$REPOSITORY-prd:${{ github.run_number }}"
 
           docker pull "$IMAGE"
 

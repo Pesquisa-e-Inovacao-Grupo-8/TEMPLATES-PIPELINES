@@ -43,7 +43,7 @@ jobs:
           USERNAME=$(echo -n "$DOCKERHUB_USERNAME" | tr -d '\r\n')
           REPOSITORY=$(echo -n "$GITHUB_REPOSITORY_NAME" | tr -d '\r\n' | tr '[:upper:]' '[:lower:]')
 
-          IMAGE="$USERNAME/$REPOSITORY:${{ github.run_number }}"
+          IMAGE="$USERNAME/$REPOSITORY-qa:${{ github.run_number }}"
 
           echo "Repository: $REPOSITORY"
           echo "Organization: $GITHUB_ORGANIZATION"
