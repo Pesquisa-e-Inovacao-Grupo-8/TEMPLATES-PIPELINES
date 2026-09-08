@@ -32,27 +32,6 @@ jobs:
       previous_image: ${{ steps.get-previous-image.outputs.previous_image }}
 
     steps:
-      - name: Get Current Image
-        id: get-previous-image
-        shell: bash
-        run: |
-
-          PREVIOUS_IMAGE=$(ssh \
-            -i "/home/ubuntu/.ssh/vm-key-pair.pem" \
-            -o StrictHostKeyChecking=no \
-            ubuntu@${{ secrets.EC2_DNS_PRD }} << 'EOF'
-
-          PROJECT_DIR="/home/ubuntu/${{ inputs.GITHUB_REPOSITORY_NAME }}"
-
-          cd "$PROJECT_DIR"
-          sudo docker compose config --images | head -n 1
-          EOF
-          )
-
-          PREVIOUS_IMAGE=$(echo "$PREVIOUS_IMAGE" | tail -n 1 | tr -d '\r')
-          echo "Imagem atual: $PREVIOUS_IMAGE"
-          echo "previous_image=$PREVIOUS_IMAGE" >> "$GITHUB_OUTPUT"
-
       - name: Deploy Application
         shell: bash
         run: |
