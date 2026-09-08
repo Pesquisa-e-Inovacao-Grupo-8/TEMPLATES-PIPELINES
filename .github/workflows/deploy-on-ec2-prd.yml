@@ -27,6 +27,7 @@ on:
         required: true
       
 
+jobs:
   deploy-ec2-prd:
     name: Deploy to EC2 - PRD
     runs-on: vm-ec2-runner-aws
