@@ -34,6 +34,7 @@ jobs:
 
   deploy-qa:
     name: Deploy to EC2 - QA
+    if: github.ref != 'refs/heads/main' 
     needs: docker-qa
     uses: Pesquisa-e-Inovacao-Grupo-8/TEMPLATES-PIPELINES/.github/workflows/deploy-on-ec2-qa.yml@main
     with:
@@ -46,7 +47,7 @@ jobs:
 
   docker-prd:
     name: Docker Build - PRD
-    needs: deploy-qa
+    needs: docker-qa
     uses: Pesquisa-e-Inovacao-Grupo-8/TEMPLATES-PIPELINES/.github/workflows/docker-build-prd.yml@main
     with:
       GITHUB_REPOSITORY_NAME: ${{ inputs.GITHUB_REPOSITORY_NAME }}

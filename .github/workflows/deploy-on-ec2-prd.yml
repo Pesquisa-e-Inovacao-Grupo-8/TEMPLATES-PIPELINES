@@ -14,10 +14,6 @@ on:
         type: string
 
     secrets:
-      EC2_DNS_QA:
-        description: "EC2 DNS QA"
-        required: true
-
       EC2_DNS_PRD:
         description: "EC2 DNS PRD"
         required: true
@@ -30,7 +26,7 @@ on:
 jobs:
   deploy-ec2-prd:
     name: Deploy to EC2 - PRD
-    runs-on: vm-ec2-runner-aws
+    runs-on: vm-ec2-aws-prd
     environment: PRD
     outputs:
       previous_image: ${{ steps.get-previous-image.outputs.previous_image }}
@@ -93,7 +89,7 @@ jobs:
   rollback-ec2-prd:
     name: Rollback EC2 - PRD
     needs: deploy-ec2-prd
-    runs-on: vm-ec2-runner-aws
+    runs-on: vm-ec2-aws-prd
     environment: ROLLBACK
     steps:
 

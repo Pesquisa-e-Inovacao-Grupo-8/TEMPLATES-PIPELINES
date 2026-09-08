@@ -20,7 +20,7 @@ on:
 
 jobs:
   docker:
-    name: Pull & Tag - DOCKER
+    name: Build & Push - DOCKER PRD
     runs-on: ubuntu-latest
 
     env:
@@ -35,7 +35,10 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Pull & Tag Docker Image
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build & Push Docker Image
         run: |
           USERNAME=$(echo -n "$DOCKERHUB_USERNAME" | tr -d '\r\n')
           REPOSITORY=$(echo -n "$GITHUB_REPOSITORY_NAME" | tr -d '\r\n' | tr '[:upper:]' '[:lower:]')
@@ -46,6 +49,5 @@ jobs:
           echo "Organization: $GITHUB_ORGANIZATION"
           echo "Image: $IMAGE"
 
-          docker pull "$IMAGE"
-          docker tag "$IMAGE" "$IMAGE"
+          docker build -t "$IMAGE" .
           docker push "$IMAGE"
