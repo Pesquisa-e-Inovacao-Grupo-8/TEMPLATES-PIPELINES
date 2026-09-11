@@ -54,9 +54,11 @@ jobs:
           echo "GITHUB_REPOSITORY: $GITHUB_REPOSITORY_NAME"
           echo "GITHUB_ORGANIZATION: $GITHUB_ORGANIZATION"
           echo "SONAR_PROJECT_KEY: $SONAR_PROJECT_KEY"
+          echo "SONAR_PROJECT_NAME: $GITHUB_REPOSITORY_NAME"
 
           echo "organization=$GITHUB_ORGANIZATION" >> "$GITHUB_OUTPUT"
           echo "project_key=$SONAR_PROJECT_KEY" >> "$GITHUB_OUTPUT"
+          echo "project_name=$GITHUB_REPOSITORY_NAME" >> "$GITHUB_OUTPUT"
 
       - name: SonarCloud
         uses: SonarSource/sonarqube-scan-action@v6
@@ -65,5 +67,6 @@ jobs:
         with:
           args: >
             -Dsonar.projectKey=${{ steps.sonar.outputs.project_key }}
+            -Dsonar.projectName=${{ steps.sonar.outputs.project_name }}
             -Dsonar.organization=${{ steps.sonar.outputs.organization }}
             -Dsonar.host.url=https://sonarcloud.io

@@ -55,6 +55,7 @@ jobs:
           ORG_LOWER=$(echo "$GITHUB_ORGANIZATION" | tr '[:upper:]' '[:lower:]')
           echo "org_lower=$ORG_LOWER" >> "$GITHUB_OUTPUT"
           echo "project_key=${ORG_LOWER}_${GITHUB_REPOSITORY_NAME}" >> "$GITHUB_OUTPUT"
+          echo "project_name=$GITHUB_REPOSITORY_NAME" >> "$GITHUB_OUTPUT"
 
       - name: SonarCloud Scan
         uses: SonarSource/sonarqube-scan-action@v4
@@ -63,6 +64,7 @@ jobs:
         with:
           args: >
             -Dsonar.projectKey=${{ steps.sonar_vars.outputs.project_key }}
+            -Dsonar.projectName=${{ steps.sonar_vars.outputs.project_name }}
             -Dsonar.organization=${{ steps.sonar_vars.outputs.org_lower }}
             -Dsonar.sources=.
             -Dsonar.python.version=3.13
