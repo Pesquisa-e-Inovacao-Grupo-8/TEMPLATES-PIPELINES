@@ -44,6 +44,7 @@ jobs:
           GITHUB_ORGANIZATION: ${{ inputs.GITHUB_ORGANIZATION }}
           GITHUB_REPOSITORY_NAME: ${{ inputs.GITHUB_REPOSITORY_NAME }}
         run: |
+          chmod +x ./mvnw
           GITHUB_ORGANIZATION=$(echo "$GITHUB_ORGANIZATION" | tr '[:upper:]' '[:lower:]')
 
           echo "GITHUB_REPOSITORY: $GITHUB_REPOSITORY_NAME"
