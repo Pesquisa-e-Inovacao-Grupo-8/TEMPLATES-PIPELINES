@@ -93,6 +93,17 @@ jobs:
 
           cd "$PROJECT_DIR"
 
+          if [ -f docker-compose.yml ]; then
+            echo "docker-compose.yml exists."
+          else
+            curl -fsSL \
+              -H "Authorization: Bearer $DEPLOY_TOKEN" \
+              -H "Accept: application/vnd.github.raw+json" \
+              "https://api.github.com/repos/Pesquisa-e-Inovacao-Grupo-8/${{ inputs.GITHUB_REPOSITORY_NAME }}/contents/docker-compose.yml" \
+              -o docker-compose.yml
+          fi
+
+
           USERNAME=$(echo -n "${{ secrets.DOCKERHUB_USERNAME }}" | tr -d '\r\n')
           REPOSITORY=$(echo -n "${{ inputs.GITHUB_REPOSITORY_NAME }}" | tr -d '\r\n' | tr '[:upper:]' '[:lower:]')
           PREVIOUS_RUN=$(( ${{ github.run_number }} - 1 ))
