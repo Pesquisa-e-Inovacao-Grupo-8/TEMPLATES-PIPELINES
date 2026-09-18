@@ -51,11 +51,9 @@ jobs:
           if [ -f docker-compose.yml ]; then
             echo "docker-compose.yml exists."
           else
-            curl -fsSL \
-              -H "Authorization: Bearer $DEPLOY_TOKEN" \
-              -H "Accept: application/vnd.github.raw+json" \
-              "https://api.github.com/repos/Pesquisa-e-Inovacao-Grupo-8/${{ inputs.GITHUB_REPOSITORY_NAME }}/contents/docker-compose.yml" \
-              -o docker-compose.yml
+            echo "docker-compose.yml does not exist. Downloading..."
+            echo "Downloading docker-compose.yml from GitHub repository..."
+            curl -L "https://raw.githubusercontent.com/Pesquisa-e-Inovacao-Grupo-8/${{ inputs.GITHUB_REPOSITORY_NAME }}/main/docker-compose.yml" -o docker-compose.yml
           fi
 
           USERNAME=$(echo -n "${{ secrets.DOCKERHUB_USERNAME }}" | tr -d '\r\n')
