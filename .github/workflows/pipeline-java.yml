@@ -1,63 +1,71 @@
-name: BACK-END-JAVA - 
+name: BACK-END-JAVA
 
 on:
   workflow_call:
 
-jobs:
+permissions:
+  contents: read
+  pull-requests: read
 
+jobs:
   sonarqube:
     name: SonarCloud Analysis
-    uses: Pesquisa-e-Inovacao-Grupo-8/TEMPLATES-PIPELINES/.github/workflows/actions/sonarqube/java
-    secrets: inherit
+    runs-on: ubuntu-latest
+    steps:
+      - name: SonarCloud - Java
+        uses: Pesquisa-e-Inovacao-Grupo-8/TEMPLATES-PIPELINES/.github/actions/sonarqube/java@nova-arquitetura
+        with:
+          sonar_token: ${{ secrets.SONAR_TOKEN }}
 
   DeployQA:
-    name: QA
+    name: Build + Deploy - QA
     if: github.ref != 'refs/heads/main'
     needs: sonarqube
-    runs-on: ubuntu-latest
+    runs-on: vm-ec2-aws-qa
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
       - name: Docker Build - QA
-        uses: Pesquisa-e-Inovacao-Grupo-8/TEMPLATES-PIPELINES/.github/workflows/actions/docker/qa
+        uses: Pesquisa-e-Inovacao-Grupo-8/TEMPLATES-PIPELINES/.github/actions/docker/qa@nova-arquitetura
+        with:
+          dockerhub_username: ${{ secrets.DOCKERHUB_USERNAME }}
+          dockerhub_token: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Deploy - QA
-        uses: Pesquisa-e-Inovacao-Grupo-8/TEMPLATES-PIPELINES/.github/workflows/actions/deploy/qa
-        secrets:
-          EC2_DNS_QA: ${{ secrets.EC2_PRIVATE_DNS_QA }}
-          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+        uses: Pesquisa-e-Inovacao-Grupo-8/TEMPLATES-PIPELINES/.github/actions/deploy/qa@nova-arquitetura
+        with:
+          ec2_dns_qa: ${{ secrets.EC2_PRIVATE_DNS_QA }}
+          dockerhub_username: ${{ secrets.DOCKERHUB_USERNAME }}
+          deploy_token: ${{ secrets.DEPLOY_TOKEN }}
 
   PRD:
-    name: PRD
+    name: Build + Deploy - PRD
     environment: PRD
     if: github.ref == 'refs/heads/main'
     needs: [sonarqube, DeployQA]
     runs-on: vm-ec2-aws-prd
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
 
+    steps:
       - name: Docker Build - PRD
-        uses: Pesquisa-e-Inovacao-Grupo-8/TEMPLATES-PIPELINES/.github/workflows/actions/docker/prd
+        uses: Pesquisa-e-Inovacao-Grupo-8/TEMPLATES-PIPELINES/.github/actions/docker/prd@nova-arquitetura
+        with:
+          dockerhub_username: ${{ secrets.DOCKERHUB_USERNAME }}
+          dockerhub_token: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Deploy - PRD
-        uses: Pesquisa-e-Inovacao-Grupo-8/TEMPLATES-PIPELINES/.github/workflows/actions/deploy/prd
-        secrets:
-          EC2_DNS_PRD: ${{ secrets.EC2_PRIVATE_DNS_PRD }}
-          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+        uses: Pesquisa-e-Inovacao-Grupo-8/TEMPLATES-PIPELINES/.github/actions/deploy/prd@nova-arquitetura
+        with:
+          ec2_dns_prd: ${{ secrets.EC2_PRIVATE_DNS_PRD }}
+          dockerhub_username: ${{ secrets.DOCKERHUB_USERNAME }}
 
   ROLLBACK:
-    name: ROLLBACK
+    name: Rollback - PRD
+    if: failure() && github.ref == 'refs/heads/main'
     needs: PRD
     runs-on: vm-ec2-aws-prd
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
 
+    steps:
       - name: Rollback - PRD
-        uses: Pesquisa-e-Inovacao-Grupo-8/TEMPLATES-PIPELINES/.github/workflows/actions/rollback
-        secrets:
-          EC2_DNS_PRD: ${{ secrets.EC2_PRIVATE_DNS_PRD }}
-          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+        uses: Pesquisa-e-Inovacao-Grupo-8/TEMPLATES-PIPELINES/.github/actions/deploy/rollback/prd@nova-arquitetura
+        with:
+          ec2_dns_prd: ${{ secrets.EC2_PRIVATE_DNS_PRD }}
+          dockerhub_username: ${{ secrets.DOCKERHUB_USERNAME }}
