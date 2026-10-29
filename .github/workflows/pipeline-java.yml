@@ -16,7 +16,7 @@ jobs:
         uses: Pesquisa-e-Inovacao-Grupo-8/TEMPLATES-PIPELINES/.github/workflows/actions/sonarqube/java@nova-arquitetura
 
   DeployQA:
-    name: Build + Deploy - QA
+    name: Deploy - QA
     if: github.ref != 'refs/heads/main'
     needs: sonarqube
     runs-on: vm-ec2-aws-qa
@@ -36,7 +36,7 @@ jobs:
           deploy_token: ${{ secrets.DEPLOY_TOKEN }}
 
   PRD:
-    name: Build + Deploy - PRD
+    name: Deploy - PRD
     environment: PRD
     if: github.ref == 'refs/heads/main'
     needs: [sonarqube, DeployQA]
