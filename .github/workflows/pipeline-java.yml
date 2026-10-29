@@ -14,6 +14,7 @@ jobs:
     steps:
       - name: SonarCloud - Java
         uses: Pesquisa-e-Inovacao-Grupo-8/TEMPLATES-PIPELINES/.github/actions/sonarqube/java@nova-arquitetura
+        
 
   DeployQA:
     name: Deploy - QA
