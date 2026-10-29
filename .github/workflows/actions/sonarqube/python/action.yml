@@ -1,0 +1,62 @@
+name: SonarCloud Analysis - Python
+description: Analyze a Python project using SonarCloud
+
+inputs:
+  sonar_token:
+    description: SonarCloud authentication token
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.13'
+        cache: pip
+
+    - name: Verify Python
+      shell: bash
+      run: python --version
+
+    - name: Install dependencies
+      shell: bash
+      run: |
+        set -euo pipefail
+        if [ -f requirements.txt ]; then
+          python -m pip install -r requirements.txt
+        else
+          echo "requirements.txt não encontrado; ignorando instalação."
+        fi
+
+    - name: Set Sonar variables
+      id: sonar_vars
+      shell: bash
+      env:
+        GITHUB_ORGANIZATION: ${{ github.repository_owner }}
+        GITHUB_REPOSITORY_NAME: ${{ github.event.repository.name }}
+      run: |
+        set -euo pipefail
+
+        ORG_LOWER=$(echo "$GITHUB_ORGANIZATION" | tr '[:upper:]' '[:lower:]')
+
+        echo "org_lower=$ORG_LOWER" >> "$GITHUB_OUTPUT"
+        echo "project_key=${ORG_LOWER}_${GITHUB_REPOSITORY_NAME}" >> "$GITHUB_OUTPUT"
+        echo "project_name=$GITHUB_REPOSITORY_NAME" >> "$GITHUB_OUTPUT"
+
+    - name: SonarCloud Scan
+      uses: SonarSource/sonarqube-scan-action@v4
+      env:
+        SONAR_TOKEN: ${{ inputs.sonar_token }}
+      with:
+        args: >
+          -Dsonar.projectKey=${{ steps.sonar_vars.outputs.project_key }}
+          -Dsonar.projectName=${{ steps.sonar_vars.outputs.project_name }}
+          -Dsonar.organization=${{ steps.sonar_vars.outputs.org_lower }}
+          -Dsonar.sources=.
+          -Dsonar.python.version=3.13

@@ -1,0 +1,37 @@
+name: Deploy on EC2 - PRD
+description: Deploy and rollback Docker application on production EC2
+
+inputs:
+  ec2_dns_prd:
+    description: EC2 DNS PRD
+    required: true
+  dockerhub_username:
+    description: Docker Hub username
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Deploy Application
+      shell: bash
+      env:
+        EC2_DNS: ${{ inputs.ec2_dns_prd }}
+        DOCKERHUB_USERNAME: ${{ inputs.dockerhub_username }}
+        REPOSITORY: ${{ github.event.repository.name }}
+        RUN_NUMBER: ${{ github.run_number }}
+      run: |
+        set -euo pipefail
+
+        REPOSITORY_LOWER=$(echo "$REPOSITORY" | tr '[:upper:]' '[:lower:]')
+        IMAGE="$DOCKERHUB_USERNAME/$REPOSITORY_LOWER-prd:$RUN_NUMBER"
+
+        ssh \
+          -i "/home/ubuntu/.ssh/vm-key-pair.pem" \
+          -o StrictHostKeyChecking=no \
+          "ubuntu@$EC2_DNS" \
+          "PROJECT_DIR='/home/ubuntu/$REPOSITORY'; \
+           mkdir -p \"\$PROJECT_DIR\"; \
+           cd \"\$PROJECT_DIR\"; \
+           docker pull '$IMAGE'; \
+           sed -i 's|image:.*|image: $IMAGE|g' docker-compose.yml; \
+           sudo docker compose up -d"

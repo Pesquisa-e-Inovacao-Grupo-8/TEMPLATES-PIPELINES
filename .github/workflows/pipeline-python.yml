@@ -1,0 +1,42 @@
+name: BUILD PYTHON - DOCKER
+
+on:
+  workflow_call:
+
+jobs:
+  sonarqube:
+    name: SonarCloud Analysis
+    uses: Pesquisa-e-Inovacao-Grupo-8/TEMPLATES-PIPELINES/.github/workflows/actions/sonarqube/sonarqube-python/action.yml@main
+    secrets: inherit
+
+  docker-qa:
+    name: Docker Build - QA
+    if: github.ref != 'refs/heads/main'
+    needs: sonarqube
+    uses: Pesquisa-e-Inovacao-Grupo-8/TEMPLATES-PIPELINES/.github/workflows/actions/docker/qa/action.yml@main
+    secrets: inherit
+
+  deploy-qa:
+    name: Deploy to EC2 - QA
+    if: github.ref != 'refs/heads/main'
+    needs: docker-qa
+    uses: Pesquisa-e-Inovacao-Grupo-8/TEMPLATES-PIPELINES/.github/workflows/actions/deploy/qa/action.yml@main
+    secrets:
+      EC2_DNS_QA: ${{ secrets.EC2_PRIVATE_DNS_QA }}
+      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+
+  docker-prd:
+    name: Docker Build - PRD
+    if: github.ref == 'refs/heads/main'
+    needs: sonarqube
+    uses: Pesquisa-e-Inovacao-Grupo-8/TEMPLATES-PIPELINES/.github/workflows/actions/docker/prd/action.yml@main
+    secrets: inherit
+
+  deploy-prd:
+    name: Deploy to EC2 - PRD
+    if: github.ref == 'refs/heads/main'
+    needs: docker-prd
+    uses: Pesquisa-e-Inovacao-Grupo-8/TEMPLATES-PIPELINES/.github/workflows/actions/deploy/prd/action.yml@main
+    secrets:
+      EC2_DNS_PRD: ${{ secrets.EC2_PRIVATE_DNS_PRD }}
+      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
