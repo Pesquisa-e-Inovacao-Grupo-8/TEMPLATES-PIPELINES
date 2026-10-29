@@ -1,3 +1,4 @@
+
 name: Deploy on EC2 - QA
 description: Deploy Docker application on QA EC2
 
@@ -29,36 +30,76 @@ runs:
 
         REPOSITORY_LOWER=$(echo "$REPOSITORY" | tr '[:upper:]' '[:lower:]')
 
-        ssh \
-          -i "/home/ubuntu/.ssh/vm-key-pair-dev.pem" \
-          -o StrictHostKeyChecking=no \
-          "ubuntu@$EC2_DNS" \
-          "mkdir -p '/home/ubuntu/$REPOSITORY'"
+        IMAGE="${DOCKERHUB_USERNAME}/${REPOSITORY_LOWER}-qa:${RUN_NUMBER}"
+
+        if [[ ! "$IMAGE" =~ ^[a-z0-9._-]+/[a-z0-9._-]+:[a-zA-Z0-9._-]+$ ]]; then
+          echo "::error::Invalid Docker image reference: $IMAGE"
+          exit 1
+        fi
+
+        echo "Repository: $REPOSITORY_LOWER"
+        echo "Image: $IMAGE"
+
+        SSH_OPTS=(
+          -i /home/ubuntu/.ssh/vm-key-pair-dev.pem
+          -o StrictHostKeyChecking=no
+        )
+
+        REMOTE_DIR="/home/ubuntu/$REPOSITORY"
+
+        ssh "${SSH_OPTS[@]}" "ubuntu@$EC2_DNS" \
+          "mkdir -p '$REMOTE_DIR'"
 
         # Download docker-compose.yml if it does not exist remotely.
-        ssh \
-          -i "/home/ubuntu/.ssh/vm-key-pair-dev.pem" \
-          -o StrictHostKeyChecking=no \
-          "ubuntu@$EC2_DNS" \
-          "test -f '/home/ubuntu/$REPOSITORY/docker-compose.yml'" \
-          || curl -fsSL \
+        if ! ssh "${SSH_OPTS[@]}" "ubuntu@$EC2_DNS" \
+          "test -f '$REMOTE_DIR/docker-compose.yml'"; then
+
+          curl -fsSL \
             -H "Authorization: Bearer $DEPLOY_TOKEN" \
             -H "Accept: application/vnd.github.raw+json" \
             "https://api.github.com/repos/$GITHUB_REPOSITORY/contents/docker-compose.yml" \
-            | ssh \
-                -i "/home/ubuntu/.ssh/vm-key-pair-dev.pem" \
-                -o StrictHostKeyChecking=no \
-                "ubuntu@$EC2_DNS" \
-                "cat > '/home/ubuntu/$REPOSITORY/docker-compose.yml'"
+            | ssh "${SSH_OPTS[@]}" "ubuntu@$EC2_DNS" \
+                "cat > '$REMOTE_DIR/docker-compose.yml"
+        fi
 
-        IMAGE="$DOCKERHUB_USERNAME/$REPOSITORY_LOWER-qa:$RUN_NUMBER"
+        # Pass values safely to the remote shell.
+        ssh "${SSH_OPTS[@]}" "ubuntu@$EC2_DNS" \
+          bash -s -- "$REPOSITORY" "$IMAGE" <<'REMOTE'
+        set -euo pipefail
 
-        ssh \
-          -i "/home/ubuntu/.ssh/vm-key-pair-dev.pem" \
-          -o StrictHostKeyChecking=no \
-          "ubuntu@$EC2_DNS" \
-          "cd '/home/ubuntu/$REPOSITORY' && \
-           docker pull '$IMAGE' && \
-           sed -i 's|image:.*|image: $IMAGE|g' docker-compose.yml && \
-           sudo docker compose down && \
-           sudo docker compose up -d"
+        REPOSITORY="$1"
+        IMAGE="$2"
+        REMOTE_DIR="/home/ubuntu/$REPOSITORY"
+
+        cd "$REMOTE_DIR"
+
+        # Update the image in docker-compose.yml.
+        IMAGE="$IMAGE" python3 - <<'PY'
+        import os
+        import re
+
+        path = "docker-compose.yml"
+        image = os.environ["IMAGE"]
+
+        with open(path, encoding="utf-8") as f:
+            content = f.read()
+
+        updated, count = re.subn(
+            r"(?m)^(\s*image:\s*).*$",
+            lambda m: m.group(1) + image,
+            content,
+            count=1,
+        )
+
+        if count == 0:
+            raise SystemExit("No image: entry found in docker-compose.yml")
+
+        with open(path, "w", encoding="utf-8") as f:
+            f.write(updated)
+        PY
+
+        docker pull "$IMAGE"
+        sudo docker compose config
+        sudo docker compose down
+        sudo docker compose up -d
+        REMOTE

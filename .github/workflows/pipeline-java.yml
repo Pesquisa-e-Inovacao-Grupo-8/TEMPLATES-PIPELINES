@@ -40,7 +40,7 @@ jobs:
   PRD:
     name: Deploy - PRD
     environment: PRD
-    if: github.ref == 'refs/heads/release' || github.ref == 'refs/heads/main'
+    if: (github.ref == 'refs/heads/release' || github.ref == 'refs/heads/main') && github.ref != 'refs/heads/develop'
     needs: [sonarqube, DeployQA]
     runs-on: vm-ec2-aws-prd
 
@@ -59,7 +59,7 @@ jobs:
 
   ROLLBACK:
     name: Rollback 
-    if: failure() && github.ref == 'refs/heads/release'
+    if: (github.ref == 'refs/heads/release' || github.ref == 'refs/heads/main') && github.ref != 'refs/heads/develop'
     needs: PRD
     runs-on: vm-ec2-aws-prd
 
