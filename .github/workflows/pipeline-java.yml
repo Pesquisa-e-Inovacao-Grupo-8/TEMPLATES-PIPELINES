@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: SonarCloud - Java
-        uses: Pesquisa-e-Inovacao-Grupo-8/TEMPLATES-PIPELINES/.github/workflows/actions/sonarqube/java@nova-arquitetura
+        uses: Pesquisa-e-Inovacao-Grupo-8/TEMPLATES-PIPELINES/.github/actions/sonarqube/java@nova-arquitetura
 
   DeployQA:
     name: Deploy - QA
@@ -23,13 +23,13 @@ jobs:
 
     steps:
       - name: Docker Build - QA
-        uses: Pesquisa-e-Inovacao-Grupo-8/TEMPLATES-PIPELINES/.github/workflows/actions/docker/qa@nova-arquitetura
+        uses: Pesquisa-e-Inovacao-Grupo-8/TEMPLATES-PIPELINES/.github/actions/docker/qa@nova-arquitetura
         with:
           dockerhub_username: ${{ secrets.DOCKERHUB_USERNAME }}
           dockerhub_token: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Deploy - QA
-        uses: Pesquisa-e-Inovacao-Grupo-8/TEMPLATES-PIPELINES/.github/workflows/actions/deploy/qa@nova-arquitetura
+        uses: Pesquisa-e-Inovacao-Grupo-8/TEMPLATES-PIPELINES/.github/actions/deploy/qa@nova-arquitetura
         with:
           ec2_dns_qa: ${{ secrets.EC2_PRIVATE_DNS_QA }}
           dockerhub_username: ${{ secrets.DOCKERHUB_USERNAME }}
@@ -44,26 +44,26 @@ jobs:
 
     steps:
       - name: Docker Build - PRD
-        uses: Pesquisa-e-Inovacao-Grupo-8/TEMPLATES-PIPELINES/.github/workflows/actions/docker/prd@nova-arquitetura
+        uses: Pesquisa-e-Inovacao-Grupo-8/TEMPLATES-PIPELINES/.github/actions/docker/prd@nova-arquitetura
         with:
           dockerhub_username: ${{ secrets.DOCKERHUB_USERNAME }}
           dockerhub_token: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Deploy - PRD
-        uses: Pesquisa-e-Inovacao-Grupo-8/TEMPLATES-PIPELINES/.github/workflows/actions/deploy/prd@nova-arquitetura
+        uses: Pesquisa-e-Inovacao-Grupo-8/TEMPLATES-PIPELINES/.github/actions/deploy/prd@nova-arquitetura
         with:
           ec2_dns_prd: ${{ secrets.EC2_PRIVATE_DNS_PRD }}
           dockerhub_username: ${{ secrets.DOCKERHUB_USERNAME }}
 
   ROLLBACK:
-    name: Rollback - PRD
+    name: Rollback 
     if: failure() && github.ref == 'refs/heads/main'
     needs: PRD
     runs-on: vm-ec2-aws-prd
 
     steps:
       - name: Rollback - PRD
-        uses: Pesquisa-e-Inovacao-Grupo-8/TEMPLATES-PIPELINES/.github/workflows/actions/deploy/rollback/prd@nova-arquitetura
+        uses: Pesquisa-e-Inovacao-Grupo-8/TEMPLATES-PIPELINES/.github/actions/deploy/rollback/prd@nova-arquitetura
         with:
           ec2_dns_prd: ${{ secrets.EC2_PRIVATE_DNS_PRD }}
           dockerhub_username: ${{ secrets.DOCKERHUB_USERNAME }}
